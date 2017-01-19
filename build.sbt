@@ -104,8 +104,8 @@ val project = Project(
       "-Dcom.sun.management.jmxremote.ssl=false",
       "-Dcom.sun.management.jmxremote.authenticate=false"
       ),
- 
-    mainClass in (Compile, run) := Some("deeplabs.cluster.Pluto")
+    Keys.fork in run := true,
+    mainClass in (Compile, run) := Some("deeplabs.cluster.Huff")
   ) // end of project's settings
     
 
