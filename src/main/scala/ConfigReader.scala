@@ -8,6 +8,9 @@ package deeplabs.config
 // @date  : 19 Jan 2017
 // 
 
+import cats._
+import cats.data._
+import cats.implicits._
 import cats.data.Validated
 import cats.data.Validated.{Invalid, Valid}
 
@@ -45,4 +48,24 @@ case class Config(map : Map[String,String]) {
         }
     }
 }
+
+case class AkkaConfig(hostname: String, listeningPort: Int)
+
+// 
+// This object contains some helper functions which allows
+// the developer to aggregate all errors into the non-empty list
+// 
+object Validator {
+
+  def validate[E : Semigroup, A, B, C](
+    a : Validated[E, A], 
+    b : Validated[E, B]
+    )(f : (A, B) ⇒ C) : Validated[E,C] = 
+      (a, b) match {
+        case (Valid(_a), Valid(_b)) ⇒ Valid(f(_a,_b))
+        case (Valid(_), wrongV@Invalid(_)) ⇒ wrongV
+        case (wrongV@Invalid(_), Valid(_)) ⇒ wrongV
+        case (Invalid(e1), Invalid(e2))    ⇒ Invalid(Semigroup[E].combine(e1, e2))
+      }
+} 
 

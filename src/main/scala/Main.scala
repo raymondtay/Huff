@@ -15,21 +15,44 @@ import com.typesafe.config.ConfigFactory
 
 import scala.language.postfixOps
 
-
 object Huff extends App {
 
-  val port = sys.props.getOrElse("DL_CLUSTER_PORT", default="2551")
-  val addr = sys.props.getOrElse("DL_CLUSTER_ADDRESS", default="127.0.0.1")
+  //val port = sys.props.getOrElse("DL_CLUSTER_PORT", default="2551")
+  //val addr = sys.props.getOrElse("DL_CLUSTER_ADDRESS", default="127.0.0.1")
+  /*
   val config = 
     ConfigFactory.parseString(s"akka.remote.netty.tcp.port=${port.toInt}")
     .withFallback(ConfigFactory.load())
-  println("+->" + port)
-  println("+->" + addr)
+
   implicit val actorSystem = ActorSystem("huffsystem", config)
   implicit val actorMaterializer = ActorMaterializer()
 
   actorSystem.actorOf(Props[HuffListener], name = "HuffListener")
+  */
+  import deeplabs.config._
 
+  // this is a local config
+  val config = 
+    Config(Map("hostname" -> "localhost", "port" -> "2345"))
+
+  // this is the global environmental configuration
+  val systemEnvConfig = 
+    Config(sys.env)
+
+  // this is the properties configured for this JVM 
+  val systemConfig = Config(sys.props.toMap)
+
+  val (url, port) = (config.parse[String]("hostname"), config.parse[Int]("port"))
+
+  import Validator._
+  val akkaConfig = 
+    validate(
+      config.parse[String]("hostname").toValidatedNel,
+      config.parse[Int]("port").toValidatedNel)(AkkaConfig.apply)
+
+  for {
+    c <- akkaConfig
+  } println(c)
 }
 
 /** 
