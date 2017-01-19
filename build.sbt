@@ -100,9 +100,9 @@ val project = Project(
       "-server", 
       "-XX:+UseCompressedOops",
       "-Djava.library.path=./target/native",
-      "-Dcom.sun.management.jmxremote.port=9999",
-      "-Dcom.sun.management.jmxremote.ssl=false",
-      "-Dcom.sun.management.jmxremote.authenticate=false"
+      s"-Dcom.sun.management.jmxremote.port=${sys.props.getOrElse("JMX_REMOTE_PORT", default = "9999")}",
+      s"-Dcom.sun.management.jmxremote.ssl=${sys.props.getOrElse("JMX_REMOTE_SSL", default = "false")}",
+      s"-Dcom.sun.management.jmxremote.authenticate=${sys.props.getOrElse("JMX_REMOTE_AUTHENTICATE", default = "false")}"
       ),
     Keys.fork in run := true,
     mainClass in (Compile, run) := Some("deeplabs.cluster.Huff")
