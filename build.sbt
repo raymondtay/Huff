@@ -8,42 +8,43 @@
 // Akka main library dependencies
 val akkaVersion = "2.4.16"
 val AkkaDeps = Seq(
-  "com.typesafe.akka" %% "akka-actor"                          % akkaVersion,
-  "com.typesafe.akka" %% "akka-agent"                          % akkaVersion,
-  "com.typesafe.akka" %% "akka-camel"                          % akkaVersion,
-  "com.typesafe.akka" %% "akka-cluster"                        % akkaVersion,
-  "com.typesafe.akka" %% "akka-cluster-metrics"                % akkaVersion,
-  "com.typesafe.akka" %% "akka-cluster-sharding"               % akkaVersion,
-  "com.typesafe.akka" %% "akka-cluster-tools"                  % akkaVersion,
-  "com.typesafe.akka" %% "akka-contrib"                        % akkaVersion,
-  "com.typesafe.akka" %% "akka-multi-node-testkit"             % akkaVersion,
-  "com.typesafe.akka" %% "akka-osgi"                           % akkaVersion,
-  "com.typesafe.akka" %% "akka-persistence"                    % akkaVersion,
-  "com.typesafe.akka" %% "akka-persistence-tck"                % akkaVersion,
-  "com.typesafe.akka" %% "akka-remote"                         % akkaVersion,
-  "com.typesafe.akka" %% "akka-slf4j"                          % akkaVersion,
-  "com.typesafe.akka" %% "akka-stream"                         % akkaVersion,
-  "com.typesafe.akka" %% "akka-stream-testkit"                 % akkaVersion,
-  "com.typesafe.akka" %% "akka-testkit"                        % akkaVersion,
-  "com.typesafe.akka" %% "akka-distributed-data-experimental"  % akkaVersion,
-  "com.typesafe.akka" %% "akka-typed-experimental"             % akkaVersion,
-  "com.typesafe.akka" %% "akka-persistence-query-experimental" % akkaVersion
-  )
+  "com.typesafe.akka" %% "akka-actor"                          ,
+  "com.typesafe.akka" %% "akka-agent"                          ,
+  "com.typesafe.akka" %% "akka-camel"                          ,
+  "com.typesafe.akka" %% "akka-cluster"                        ,
+  "com.typesafe.akka" %% "akka-cluster-metrics"                ,
+  "com.typesafe.akka" %% "akka-cluster-sharding"               ,
+  "com.typesafe.akka" %% "akka-cluster-tools"                  ,
+  "com.typesafe.akka" %% "akka-contrib"                        ,
+  "com.typesafe.akka" %% "akka-multi-node-testkit"             ,
+  "com.typesafe.akka" %% "akka-osgi"                           ,
+  "com.typesafe.akka" %% "akka-persistence"                    ,
+  "com.typesafe.akka" %% "akka-persistence-tck"                ,
+  "com.typesafe.akka" %% "akka-remote"                         ,
+  "com.typesafe.akka" %% "akka-slf4j"                          ,
+  "com.typesafe.akka" %% "akka-stream"                         ,
+  "com.typesafe.akka" %% "akka-stream-testkit"                 ,
+  "com.typesafe.akka" %% "akka-testkit"                        ,
+  "com.typesafe.akka" %% "akka-distributed-data-experimental"  ,
+  "com.typesafe.akka" %% "akka-typed-experimental"             ,
+  "com.typesafe.akka" %% "akka-persistence-query-experimental" 
+  ).map(_ % akkaVersion)
 
 // Akka Http project library dependencies
 val akkaHttpVersion = "10.0.1"
 val AkkaHttpDeps = Seq(
-  "com.typesafe.akka" %% "akka-http-core"       % akkaHttpVersion,
-  "com.typesafe.akka" %% "akka-http"            % akkaHttpVersion,
-  "com.typesafe.akka" %% "akka-http-testkit"    % akkaHttpVersion,
-  "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
-  "com.typesafe.akka" %% "akka-http-jackson"    % akkaHttpVersion,
-  "com.typesafe.akka" %% "akka-http-xml"        % akkaHttpVersion
-)
+  "com.typesafe.akka" %% "akka-http-core"       ,
+  "com.typesafe.akka" %% "akka-http"            ,
+  "com.typesafe.akka" %% "akka-http-testkit"    ,
+  "com.typesafe.akka" %% "akka-http-spray-json" ,
+  "com.typesafe.akka" %% "akka-http-jackson"    ,
+  "com.typesafe.akka" %% "akka-http-xml"        
+).map(_ % akkaHttpVersion)
 
-// Cats and Eff library dependencies
+// Cats , Circe and Eff library dependencies
 val catsVersion = "0.9.0"
 val effVersion  = "2.2.0"
+val circeVersion = "0.6.1"
 
 // to write types like Reader[String, ?]
 addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3")
@@ -53,13 +54,24 @@ addCompilerPlugin("com.milessabin" % "si2712fix-plugin_2.11.8" % "1.2.0")
 
 val CatsEffDeps = Seq(
   "org.typelevel" %% "cats" % catsVersion,
-  "org.atnos"     %% "eff"  % effVersion
-)
+  "org.atnos"     %% "eff"  % effVersion)
+
+val CirceDeps = Seq(
+  "io.circe"      %% "circe-core"    ,
+  "io.circe"      %% "circe-generic" ,
+  "io.circe"      %% "circe-parser"  
+).map(_ % circeVersion)
 
 val specs2Version = "3.8.5"
 val TestingDeps = Seq(
-  "org.specs2" %% "specs2-core"       % specs2Version % "test",
-  "org.specs2" %% "specs2-scalacheck" % specs2Version % "test"
+  "org.specs2" %% "specs2-core"       ,
+  "org.specs2" %% "specs2-scalacheck" 
+).map(_ % specs2Version).map(_ % "test")
+
+val scalaLoggerVersion = "3.5.0"
+val ScalaLoggerDeps = Seq(
+  "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggerVersion,
+  "ch.qos.logback" % "logback-classic" % "1.1.7"
 )
 
 doctestTestFramework    := DoctestTestFramework.Specs2
@@ -91,7 +103,7 @@ val project = Project(
         "-Xlint:unchecked",
         "-Xlint:deprecation"),
     libraryDependencies ++= 
-      CatsEffDeps ++ AkkaDeps ++ AkkaHttpDeps ++ TestingDeps,
+      CatsEffDeps ++ CirceDeps ++ AkkaDeps ++ AkkaHttpDeps ++ ScalaLoggerDeps ++ TestingDeps,
 
     javaOptions in run ++= Seq( // javaOptions when project is being run
       "-Xms1024m",

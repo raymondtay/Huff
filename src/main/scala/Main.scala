@@ -13,13 +13,18 @@ import akka.http.scaladsl.Http
 import akka.cluster.{Cluster, ClusterEvent}
 import ClusterEvent._
 import com.typesafe.config.ConfigFactory
+import com.typesafe.scalalogging._
 
+import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
 import scala.language.postfixOps
 
 object Huff extends App {
   import deeplabs.http._
+  import deeplabs.http.json._
   import deeplabs.config._
 
+  // Get the default logger
+  val logger = Logger(Huff.getClass)
   val systemEnvConfig = Config(sys.env)
 
   import Validator._
@@ -35,7 +40,13 @@ object Huff extends App {
   for {
     c <- akkaHttpConfig
   } {
-    println(s"--${c}")
+    val data = DLLog(
+      service_name = "Huff cluster",
+      category = "application",
+      event_type = "operation",
+      message = s"Starting up Http service: ${c.listeningPort}"
+      )
+    logger.info(data.asJson.noSpaces)
     implicit val actorSystem = ActorSystem("huffsystem", ConfigFactory.load())
     implicit val actorMaterializer = ActorMaterializer()
     actorSystem.actorOf(Props[HuffListener], name = "HuffListener")
