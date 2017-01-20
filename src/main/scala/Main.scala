@@ -15,6 +15,8 @@ import ClusterEvent._
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging._
 
+import akka.event.{LoggingAdapter, Logging}
+
 import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
 import scala.language.postfixOps
 

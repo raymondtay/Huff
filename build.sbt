@@ -78,6 +78,8 @@ doctestTestFramework    := DoctestTestFramework.Specs2
 doctestWithDependencies := false
 doctestMarkdownEnabled  := true
 
+enablePlugins(JavaServerAppPackaging) // enable the sbt-native-packager plugin
+
 val project = Project(
   id = "Huff",
   base = file(".")
