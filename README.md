@@ -31,7 +31,14 @@ available via `8080` and `8081`.
 
 To run a 2-node cluster node on your local machine, you need to perform the following
 - Open 2 terminals and navigate to the code base
-- In 1st terminal, activate the cluster: `sbt run`
+- In 1st terminal, do the following:
+ 
+    > export DL_HTTP_ADDRESS=localhost
+    
+    > export DL_HTTP_PORT=8080
+    
+    > codebase_dir #> sbt run
+
 - In 2nd terminal, as we cannot launch another process to bind to the same ports, so we have
   to make sure they run on different ports. E.g.
   
