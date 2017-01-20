@@ -22,8 +22,9 @@ either locally or distributed across nodes:
 
 ## Running locally via `sbt`
 
-If its done properly, you would have a 2-node cluster communicating
-internal via ports `2551` and `2551` and the `Http` service would be 
+When running locally, a user process typically cannot `bind` to a local port _twice_ and therefore
+we need to bind to different ports. If its done properly, you would have a 2-node cluster communicating
+internal via ports `2551` and `2552` and the `Http` service would be 
 available via `8080` and `8081`.
 
 ### An example ...
@@ -31,13 +32,19 @@ available via `8080` and `8081`.
 To run a 2-node cluster node on your local machine, you need to perform the following
 - Open 2 terminals and navigate to the code base
 - In 1st terminal, activate the cluster: `sbt run`
-- In 2nd terminal, as we cannot launch another process to bind to the same ports, so we have\
+- In 2nd terminal, as we cannot launch another process to bind to the same ports, so we have
   to make sure they run on different ports. E.g.
-  >  export DL_CLUSTER_ADDRESS=localhost
-  >  export DL_CLUSTER_PORT=2552
-  >  export DL_HTTP_ADDRESS=localhost
-  >  export DL_HTTP_PORT=8081
-  >  sbt -DJMX_REMOTE_PORT=9999 run
+  
+    >  export DL_CLUSTER_ADDRESS=localhost
+    
+    >  export DL_CLUSTER_PORT=2552
+    
+    >  export DL_HTTP_ADDRESS=localhost
+    
+    >  export DL_HTTP_PORT=8081
+    
+    >  codebase_dir #> sbt -DJMX_REMOTE_PORT=9999 run
+
 
 ### Http Test
 
