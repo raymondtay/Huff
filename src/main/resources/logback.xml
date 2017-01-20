@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding"UTF-8"?>
 <configuration>
 
   <appender name="FILELOG" class="ch.qos.logback.core.FileAppender">
-    <File>logs/huff.log</File>
+    <file>${application.home:-.}/logs/huff.log</file>
     <param name="Append" value="true" />
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
       <pattern>*** %date{ISO8601} %-5level %logger{36} %X{sourceThread} - %msg%n</pattern>
@@ -11,17 +10,17 @@
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-      <pattern>+++ %date{ISO8601} %-5level %logger{36} %X{sourceThread} - %msg%n</pattern>
+      <pattern> %date{ISO8601} %-5level %logger{36} %X{sourceThread} - %msg%n</pattern>
     </encoder>
   </appender>
 
-  <appender name="FILE_ASYNC" class="ch.qos.logback.core.AsyncAppender">
+  <appender name="FILE_ASYNC" class="ch.qos.logback.classic.AsyncAppender">
     <queueSize>500</queueSize>
     <appender-ref ref="FILELOG"/>
     <includeCallerData>true</includeCallerData> <!-- remove if performance affected -->
   </appender>
 
-  <appender name="CONSOLE_ASYNC" class="ch.qos.logback.core.AsyncAppender">
+  <appender name="CONSOLE_ASYNC" class="ch.qos.logback.classic.AsyncAppender">
     <queueSize>500</queueSize>
     <appender-ref ref="STDOUT"/>
   </appender>

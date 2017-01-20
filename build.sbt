@@ -56,30 +56,40 @@ val CatsEffDeps = Seq(
   "org.typelevel" %% "cats" % catsVersion,
   "org.atnos"     %% "eff"  % effVersion)
 
+// light-weight json library
 val CirceDeps = Seq(
   "io.circe"      %% "circe-core"    ,
   "io.circe"      %% "circe-generic" ,
   "io.circe"      %% "circe-parser"  
 ).map(_ % circeVersion)
 
+// specs2 / scalacheck testing framework
 val specs2Version = "3.8.5"
 val TestingDeps = Seq(
   "org.specs2" %% "specs2-core"       ,
   "org.specs2" %% "specs2-scalacheck" 
 ).map(_ % specs2Version).map(_ % "test")
 
+// scala logging framework
 val scalaLoggerVersion = "3.5.0"
 val ScalaLoggerDeps = Seq(
   "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggerVersion,
+  "ch.qos.logback" % "logback-core"    % "1.1.7",
   "ch.qos.logback" % "logback-classic" % "1.1.7"
 )
 
+// settings related to sbt-doctest
 doctestTestFramework    := DoctestTestFramework.Specs2
 doctestWithDependencies := false
 doctestMarkdownEnabled  := true
 
+// settings related to sbt-native-packager
 enablePlugins(JavaServerAppPackaging) // enable the sbt-native-packager plugin
+maintainer in Docker         := "Raymond Tay <rtay@deep-labs.com>"
+packageSummary in Docker     := "Huff Cluster"
+packageDescription in Docker := "Http service wrapped inside Akka cluster"
 
+// project settings in sbt
 val project = Project(
   id = "Huff",
   base = file(".")
