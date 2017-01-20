@@ -49,7 +49,7 @@ case class Config(map : Map[String,String]) {
     }
 }
 
-case class AkkaConfig(hostname: String, listeningPort: Int)
+case class AkkaHttpConfig(hostname: String, listeningPort: Int)
 
 // 
 // This object contains some helper functions which allows

@@ -9,6 +9,7 @@ package deeplabs.cluster
 
 import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
 import akka.stream.ActorMaterializer
+import akka.http.scaladsl.Http
 import akka.cluster.{Cluster, ClusterEvent}
 import ClusterEvent._
 import com.typesafe.config.ConfigFactory
@@ -16,43 +17,30 @@ import com.typesafe.config.ConfigFactory
 import scala.language.postfixOps
 
 object Huff extends App {
-
-  //val port = sys.props.getOrElse("DL_CLUSTER_PORT", default="2551")
-  //val addr = sys.props.getOrElse("DL_CLUSTER_ADDRESS", default="127.0.0.1")
-  /*
-  val config = 
-    ConfigFactory.parseString(s"akka.remote.netty.tcp.port=${port.toInt}")
-    .withFallback(ConfigFactory.load())
-
-  implicit val actorSystem = ActorSystem("huffsystem", config)
-  implicit val actorMaterializer = ActorMaterializer()
-
-  actorSystem.actorOf(Props[HuffListener], name = "HuffListener")
-  */
+  import deeplabs.http._
   import deeplabs.config._
 
-  // this is a local config
-  val config = 
-    Config(Map("hostname" -> "localhost", "port" -> "2345"))
-
-  // this is the global environmental configuration
-  val systemEnvConfig = 
-    Config(sys.env)
-
-  // this is the properties configured for this JVM 
-  val systemConfig = Config(sys.props.toMap)
-
-  val (url, port) = (config.parse[String]("hostname"), config.parse[Int]("port"))
+  val systemEnvConfig = Config(sys.env)
 
   import Validator._
-  val akkaConfig = 
+  val akkaHttpConfig = 
     validate(
-      config.parse[String]("hostname").toValidatedNel,
-      config.parse[Int]("port").toValidatedNel)(AkkaConfig.apply)
+      systemEnvConfig.parse[String]("DL_HTTP_ADDRESS").toValidatedNel,
+      systemEnvConfig.parse[Int]("DL_HTTP_PORT").toValidatedNel)(AkkaHttpConfig.apply)
 
+  //
+  // The cluster node is only started when the configuration is 
+  // valid and correct; otherwise, the logs would capture
+  //
   for {
-    c <- akkaConfig
-  } println(c)
+    c <- akkaHttpConfig
+  } {
+    println(s"--${c}")
+    implicit val actorSystem = ActorSystem("huffsystem", ConfigFactory.load())
+    implicit val actorMaterializer = ActorMaterializer()
+    actorSystem.actorOf(Props[HuffListener], name = "HuffListener")
+    val bindingF = Http().bindAndHandle(Routes.route, c.hostname, c.listeningPort)
+  }
 }
 
 /** 
