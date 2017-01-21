@@ -11,11 +11,13 @@ Huff is a peer-to-peer clustering solution that provides the following functiona
 The following variables affect how the cluster is to be run 
 either locally or distributed across nodes:
 
-- `DL_CLUSTER_ADDRESS` e.g. `localhost`, `0.0.0.0`
-- `DL_CLUSTER_PORT` e.g `2551` (this needs to be `distinct` if cluster nodes are run locally)
-- `DL_HTTP_ADDRESS` e.g. `localhost`, `0.0.0.0`
-- `DL_HTTP_PORT`    e.g. `8080`
-
+- `DL_CLUSTER_NAME`      # a name for the cluster  e.g. huffcluster
+- `DL_CLUSTER_ADDRESS`   # valid hostname or ipv4/v6 e.g. `localhost`, `0.0.0.0`
+- `DL_CLUSTER_SEED_NODE` # Must be pointing to a valid url of the cluster e.g. `localhost:2551`, `0.0.0.0:2551` 
+- `DL_CLUSTER_PORT`      # Port number of cluster is listening e.g `2551` (this needs to be `distinct` if cluster nodes are run locally i.e. w/o `docker`)
+- `DL_HTTP_ADDRESS`      # valid hostname or ipv4/v6 e.g. `localhost`, `0.0.0.0`
+- `DL_HTTP_PORT`         # Port number of http servie e.g. `8080`
+- `IS_SEED`              # when `true`,`yes` or `1` then we will launch this as a seed-node otherwise its converse means not a seed-node
 - `JMX_REMOTE_PORT`
 - `JMX_REMOTE_SSL`
 - `JMX_REMOTE_AUTHENTICATE`
