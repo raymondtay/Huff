@@ -40,8 +40,13 @@ RUN \
 # Getting the Cluster environment ready.
 # Running the process as a foreground
 WORKDIR /root/huff-0.9
+ENV DL_CLUSTER_NAME huffcluster
+ENV DL_CLUSTER_PORT 2551
+# a string value like "" or "<host/ip>:<port>"
+ENV DL_CLUSTER_SEED_NODE ""
+ENV IS_SEED true
 ENV DL_HTTP_ADDRESS 0.0.0.0
 ENV DL_HTTP_PORT    8080
-EXPOSE 2551 8080
-RUN ./bin/huff
+EXPOSE 2551 32810 8080
+# RUN ./bin/huff
 

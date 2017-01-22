@@ -24,6 +24,21 @@ object Read {
   implicit val stringRead: Read[String] = 
     new Read[String]{def read(s: String) : Option[String] = Some(s)}
 
+  implicit val booleanRead: Read[Boolean] =
+    new Read[Boolean] {
+      def read(s:String) : Option[Boolean] = {
+        s.toLowerCase match {
+          case "true"  ⇒  Some(true)
+          case "false" ⇒  Some(false)
+          case "yes"   ⇒  Some(true)
+          case "no"    ⇒  Some(false)
+          case "1"     ⇒  Some(true)
+          case "0"     ⇒  Some(false)
+          case s       ⇒  None
+        }
+      }
+    }
+
   implicit val intRead: Read[Int] = 
     new Read[Int]{
       def read(s: String) : Option[Int] = {
@@ -49,7 +64,13 @@ case class Config(map : Map[String,String]) {
     }
 }
 
-case class AkkaHttpConfig(hostname: String, listeningPort: Int)
+case class HuffConfig(
+  clusterName: String,
+  clusterPort : Int,
+  isSeed : Boolean,
+  seedNodes : Seq[String], 
+  hostname: String, 
+  listeningPort: Int)
 
 // 
 // This object contains some helper functions which allows

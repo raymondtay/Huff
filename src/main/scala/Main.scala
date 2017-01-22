@@ -12,8 +12,14 @@ import akka.stream.ActorMaterializer
 import akka.http.scaladsl.Http
 import akka.cluster.{Cluster, ClusterEvent}
 import ClusterEvent._
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{ConfigFactory, ConfigValueFactory}
 import com.typesafe.scalalogging._
+
+import cats._
+import cats.data._
+import cats.implicits._
+
+import scala.collection.JavaConverters._
 
 import akka.event.{LoggingAdapter, Logging}
 
@@ -30,26 +36,50 @@ object Huff extends App {
   val systemEnvConfig = Config(sys.env)
 
   import Validator._
-  val akkaHttpConfig = 
-    validate(
+
+  def getHuffConfig : ValidatedNel[ConfigError, HuffConfig] = 
+    Apply[ValidatedNel[ConfigError, ?]].map6(
+      systemEnvConfig.parse[String]("DL_CLUSTER_NAME").toValidatedNel,
+      systemEnvConfig.parse[Int]("DL_CLUSTER_PORT").toValidatedNel,
+      systemEnvConfig.parse[Boolean]("IS_SEED").toValidatedNel,
+      systemEnvConfig.parse[String]("DL_CLUSTER_SEED_NODE").toValidatedNel,
       systemEnvConfig.parse[String]("DL_HTTP_ADDRESS").toValidatedNel,
-      systemEnvConfig.parse[Int]("DL_HTTP_PORT").toValidatedNel)(AkkaHttpConfig.apply)
+      systemEnvConfig.parse[Int]("DL_HTTP_PORT").toValidatedNel) {
+        case (clusterName, clusterPort, isSeed, dlClusterSeedNode, httpAddr, httpPort) ⇒ 
+          val ip = ContainerHostIp.load() getOrElse "127.0.0.1"
+          val seedNodeStrings = 
+            dlClusterSeedNode.isEmpty match {
+              case true ⇒ 
+                Seq(s"""akka.cluster.seed-nodes += "akka.tcp://$clusterName@$ip:$clusterPort"""")
+              case false ⇒ 
+                Seq(s"""akka.cluster.seed-nodes += "akka.tcp://$clusterName@$ip:$clusterPort"""",
+                    s"""akka.cluster.seed-nodes += "akka.tcp://$clusterName@$dlClusterSeedNode"""")
+            }
+
+          HuffConfig(clusterName, clusterPort, isSeed, seedNodeStrings, httpAddr, httpPort)
+      }
 
   //
   // The cluster node is only started when the configuration is 
   // valid and correct; otherwise, the logs would capture
   //
   for {
-    c <- akkaHttpConfig
+    c <- getHuffConfig
   } {
     val data = DLLog(
       service_name = "Huff cluster",
-      category = "application",
-      event_type = "operation",
-      message = s"Starting up Http service: ${c.listeningPort}"
+      category     = "application",
+      event_type   = "operation",
+      message      = s"Starting up Http service: ${c.listeningPort}"
       )
     logger.info(data.asJson.noSpaces)
-    implicit val actorSystem = ActorSystem("huffsystem", ConfigFactory.load())
+    implicit val actorSystem = 
+      ActorSystem(c.clusterName, 
+        ConfigFactory.load().
+        withValue("akka.cluster.seed-nodes", ConfigFactory.parseString(c.seedNodes.mkString("\n")) resolve() getList("akka.cluster.seed-nodes")).
+        withValue("akka.remote.netty.tcp.hostname", ConfigValueFactory.fromAnyRef(ContainerHostIp.load getOrElse "127.0.0.1")).
+        withValue("akka.remote.netty.tcp.port", ConfigValueFactory.fromAnyRef(2551)).resolve()
+      )
     implicit val actorMaterializer = ActorMaterializer()
     actorSystem.actorOf(Props[HuffListener], name = "HuffListener")
     val bindingF = Http().bindAndHandle(Routes.route, c.hostname, c.listeningPort)

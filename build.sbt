@@ -78,6 +78,11 @@ val ScalaLoggerDeps = Seq(
   "ch.qos.logback" % "logback-classic" % "1.1.7"
 )
 
+// commandline parser
+val CliDeps = Seq(
+  "com.github.scopt" %% "scopt" % "3.5.0"
+)
+
 // settings related to sbt-doctest
 doctestTestFramework    := DoctestTestFramework.Specs2
 doctestWithDependencies := false
@@ -89,7 +94,7 @@ doctestMarkdownEnabled  := true
 val project = Project(
   id = "Huff",
   base = file(".")
-  ).settings(
+  ).enablePlugins(JavaServerAppPackaging,UniversalPlugin).settings(
     name         := "Huff",
     version      := "0.9",
     scalaVersion := "2.11.8",
@@ -111,7 +116,7 @@ val project = Project(
         "-Xlint:unchecked",
         "-Xlint:deprecation"),
     libraryDependencies ++= 
-      CatsEffDeps ++ CirceDeps ++ AkkaDeps ++ AkkaHttpDeps ++ ScalaLoggerDeps ++ TestingDeps,
+      CatsEffDeps ++ CliDeps ++ CirceDeps ++ AkkaDeps ++ AkkaHttpDeps ++ ScalaLoggerDeps ++ TestingDeps,
 
     javaOptions in run ++= Seq( // javaOptions when project is being run
       "-Xms1024m",
@@ -124,6 +129,7 @@ val project = Project(
       s"-Dcom.sun.management.jmxremote.ssl=${sys.props.getOrElse("JMX_REMOTE_SSL", default = "false")}",
       s"-Dcom.sun.management.jmxremote.authenticate=${sys.props.getOrElse("JMX_REMOTE_AUTHENTICATE", default = "false")}"
       ),
+    javaOptions in Universal := (javaOptions in run).value, // propagate `run` settings to packaged scripts
     Keys.fork in run := true,
     mainClass in (Compile, run) := Some("deeplabs.cluster.Huff")
   ) // end of project's settings
