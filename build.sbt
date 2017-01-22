@@ -83,13 +83,9 @@ doctestTestFramework    := DoctestTestFramework.Specs2
 doctestWithDependencies := false
 doctestMarkdownEnabled  := true
 
-// settings related to sbt-native-packager
-enablePlugins(JavaServerAppPackaging) // enable the sbt-native-packager plugin
-maintainer in Docker         := "Raymond Tay <rtay@deep-labs.com>"
-packageSummary in Docker     := "Huff Cluster"
-packageDescription in Docker := "Http service wrapped inside Akka cluster"
-
-// project settings in sbt
+// 
+// Project settings in sbt
+// 
 val project = Project(
   id = "Huff",
   base = file(".")

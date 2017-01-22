@@ -59,6 +59,24 @@ At this point, you should have the 2-node cluster running locally
 and you can perform the test as follows via `curl` : `curl -v http://localhost:8080/status`
 which should return a message `System-node OK`.
 
+# Running via `Docker`  
+
+The presumption is that you should have installed `docker` on the target machine
+or machines you plan to run this cluster service in. You can run this service in two
+modes:
+
+- As a `development` machine
+- As a `production` machine
+
+## Run-As-A-Development environment 
+
+TBA.
+
+## Run-As-A-Production environment
+
+TBA.
+
+
 *TODO*:
 - Insert code snippets w.r.t how to run the server from the `sbt`
 - Insert code snippets w.r.t how to run the packaging from `sbt`, including executing
