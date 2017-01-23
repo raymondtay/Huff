@@ -47,6 +47,6 @@ ENV DL_CLUSTER_SEED_NODE ""
 ENV IS_SEED true
 ENV DL_HTTP_ADDRESS 0.0.0.0
 ENV DL_HTTP_PORT    8080
-EXPOSE 2551 32810 8080
-# RUN ./bin/huff
+# Commented out the entry point
+# ENTRYPOINT ["./bin/huff"]
 
