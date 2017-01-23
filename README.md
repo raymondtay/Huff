@@ -68,19 +68,25 @@ or machines you plan to run this cluster service in. You can run this service in
 modes:
 
 - As a `development` machine
-- As a `production` machine
+- As a `production` machine (To be announced at a later date)
 
-## Run-As-A-Development environment 
+## Run-As-A-Development environment ( meant for *local* development only ) 
 
-TBA.
+Using `docker` as the approach, we would first need a docker container
+containing the `Huff` cluster service. Follow the steps as prescribed:
 
-## Run-As-A-Production environment
+- Find the `Dockerfile` and run the command `docker build -t huff .`
+- Verify that the image is indeed present by running `docker images`
+- Run the `seed`-node-1 of the cluster via `docker run -t -i -p 2551:2551 -p 8080:8080 huff /bin/bash`
+-- This should bring you into the container and then you run the container via `./bin/huff`
+- Run the `seed`-node-2 of the cluster via `docker run -t -i -p 2552:2552 -p 8081:8080 huff /bin/bash`
+-- This should bring you into the container and then you run the container via `./bin/huff`
 
-TBA.
+At this point the cluster should be operational as you can see both containers communicating with 
+one another.
 
+Now, you need to re-run the `Http Test` again to make sure you can see the message `System-node OK`
+being printed.
 
-*TODO*:
-- Insert code snippets w.r.t how to run the server from the `sbt`
-- Insert code snippets w.r.t how to run the packaging from `sbt`, including executing
 
 
