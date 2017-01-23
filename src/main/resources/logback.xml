@@ -4,13 +4,13 @@
     <file>${application.home:-.}/logs/huff.log</file>
     <param name="Append" value="true" />
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-      <pattern>*** %date{ISO8601} %-5level %logger{36} %X{sourceThread} - %msg%n</pattern>
+      <pattern>%d{"yyyy-MM-dd'T'HH:mm:ss.SSSXXX", UTC} [%-5level] [%logger{36}] %msg%n</pattern>
     </encoder>
   </appender>
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-      <pattern> %date{ISO8601} %-5level %logger{36} %X{sourceThread} - %msg%n</pattern>
+      <pattern>%d{"yyyy-MM-dd'T'HH:mm:ss.SSSXXX", UTC} [%-5level] [%logger{36}] %msg%n</pattern>
     </encoder>
   </appender>
 
