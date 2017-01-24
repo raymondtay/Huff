@@ -76,13 +76,16 @@ object Huff extends App {
     implicit val actorSystem = 
       ActorSystem(c.clusterName, 
         ConfigFactory.load().
-        withValue("akka.cluster.seed-nodes", ConfigFactory.parseString(c.seedNodes.mkString("\n")) resolve() getList("akka.cluster.seed-nodes")).
-        withValue("akka.remote.netty.tcp.hostname", ConfigValueFactory.fromAnyRef(ContainerHostIp.load getOrElse "127.0.0.1")).
-        withValue("akka.remote.netty.tcp.port", ConfigValueFactory.fromAnyRef(2551)).resolve()
+        withValue("akka.cluster.seed-nodes",
+	  ConfigFactory.parseString(c.seedNodes.mkString("\n")) resolve() getList("akka.cluster.seed-nodes")).
+        withValue("akka.remote.netty.tcp.hostname",
+	  ConfigValueFactory.fromAnyRef(ContainerHostIp.load getOrElse "127.0.0.1")).
+        withValue("akka.remote.netty.tcp.port",
+	  ConfigValueFactory.fromAnyRef(2551)).resolve()
       )
     implicit val actorMaterializer = ActorMaterializer()
     actorSystem.actorOf(Props[HuffListener], name = "HuffListener")
-    val bindingF = Http().bindAndHandle(Routes().route, c.hostname, c.listeningPort)
+    val server = new RestServer()
   }
 }
 

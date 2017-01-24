@@ -12,18 +12,31 @@ import akka.stream.ActorMaterializer
 import deeplabs.http.json.DLLog
 import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
 import com.typesafe.scalalogging.Logger
+
 //
-// Routes
+// RestService
 // 
 // The following http routes are listed here:
 // GET  `/status` - get the status of the current http node
 // POST `/video`  - post image data
 // 
-case class Routes(implicit val actorMaterializer: ActorMaterializer) {
+
+class RestServer(
+  implicit val system: ActorSystem,
+  implicit val materializer: ActorMaterializer) extends RestService {
+  def startServer(address: String, port: Int) = {
+    Http().bindAndHandle(routes, address, port)
+  }
+}
+
+trait RestService {
+
+  implicit val system: ActorSystem
+  implicit val materializer: ActorMaterializer
 
   import scala.concurrent.ExecutionContext.Implicits.global
  
-  val logger = Logger(Routes.getClass)
+  val logger = Logger("RestService")
 
   val data = DLLog(
       service_name = "Huff Http Cluster",
@@ -32,7 +45,7 @@ case class Routes(implicit val actorMaterializer: ActorMaterializer) {
       message      = ""
       )
  
-  val route : Route = 
+  val routes : Route = 
   (get & path("status")) {
     get {
       val d = data.copy(message = "URI: /status invoked. Ok.")
