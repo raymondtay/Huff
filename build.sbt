@@ -31,7 +31,11 @@ val AkkaDeps = Seq(
   ).map(_ % akkaVersion)
 
 // Akka Http project library dependencies
-val akkaHttpVersion = "10.0.1"
+// Announcements:
+// 23 Jan 2017 - http://akka.io/news/2017/01/23/akka-http-10.0.2-security-fix-released.html
+//               therefore, pushing to 10.0.2
+//
+val akkaHttpVersion = "10.0.2"
 val AkkaHttpDeps = Seq(
   "com.typesafe.akka" %% "akka-http-core"       ,
   "com.typesafe.akka" %% "akka-http"            ,

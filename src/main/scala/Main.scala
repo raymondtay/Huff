@@ -82,7 +82,7 @@ object Huff extends App {
       )
     implicit val actorMaterializer = ActorMaterializer()
     actorSystem.actorOf(Props[HuffListener], name = "HuffListener")
-    val bindingF = Http().bindAndHandle(Routes.route, c.hostname, c.listeningPort)
+    val bindingF = Http().bindAndHandle(Routes().route, c.hostname, c.listeningPort)
   }
 }
 

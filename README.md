@@ -6,6 +6,13 @@ Huff is a peer-to-peer clustering solution that provides the following functiona
 - Scalable ReST APIs
 - Coordinates the transaction on the behest of the requester
 
+# Updates
+
+- 23 Jan 2017 
+-- Potential memory leak from a DDOS targeting `akka-http` 
+   was discovered [here](http://akka.io/news/2017/01/23/akka-http-10.0.2-security-fix-released.html)
+-- Bumping version of `akka-http` from `10.0.1` to `10.0.2`
+
 # Running locally
 
 The following variables affect how the cluster is to be run 
