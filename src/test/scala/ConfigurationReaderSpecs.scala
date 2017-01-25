@@ -7,8 +7,9 @@ package deeplabs.config.test
 
 import org.scalacheck.{Arbitrary, Gen, Properties,Prop}
 import Arbitrary.arbitrary
-import Gen.{containerOfN, choose, pick, mapOf, listOf, oneOf}
+import Gen.{containerOfN, choose, pick, posNum, negNum, mapOf, listOf, oneOf}
 import Prop.{forAll, throws, AnyOperators}
+import cats.data.NonEmptyList
 import cats.data.Validated.{Invalid, Valid}
 import deeplabs.config.{ConfigError, ParseError, MissingConfig}
 
@@ -85,6 +86,14 @@ object Config extends Properties("ConfigurationProperties") {
             case false ⇒ false
           }
         }
-  }
-}
+    }
 
+  property("validator.validate tests where tuple is valid") = {
+    forAll {
+      (x: String, y:String) ⇒ 
+        implicit val nelSemigroup: cats.Semigroup[NonEmptyList[String]] = cats.SemigroupK[NonEmptyList].algebra[String]
+        deeplabs.config.Validator.validate(Valid(x), Valid(y))((_:String) ++ (_:String)) == Valid(x++y)
+    }
+  }
+
+}
