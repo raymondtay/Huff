@@ -6,9 +6,9 @@ import java.net.NetworkInterface
 
 object ContainerHostIp {
         
-  def load() : Option[String] = {
+  def load(interfaceName : String = "eth0") : Option[String] = {
     val interfaces = NetworkInterface.getNetworkInterfaces()
-    val interface = interfaces find (_.getName equals "eth0")
+    val interface = interfaces find (_.getName equals interfaceName)
     interface flatMap {
       inet ⇒ 
         inet.getInetAddresses find (_ isSiteLocalAddress) map (_ getHostAddress)

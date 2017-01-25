@@ -92,6 +92,12 @@ doctestTestFramework    := DoctestTestFramework.Specs2
 doctestWithDependencies := false
 doctestMarkdownEnabled  := true
 
+// Coverage enabled
+// Note: Its rather nonsense to have to test whether the server starts up or not.
+//       therefore they are disabled 
+coverageEnabled := true
+coverageExcludedPackages := "deeplabs\\.http\\.RestServer;deeplabs\\.cluster\\.Huff.*"
+
 // 
 // Project settings in sbt
 // 

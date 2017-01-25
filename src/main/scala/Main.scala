@@ -79,7 +79,7 @@ object Huff extends App {
         withValue("akka.cluster.seed-nodes",
 	  ConfigFactory.parseString(c.seedNodes.mkString("\n")) resolve() getList("akka.cluster.seed-nodes")).
         withValue("akka.remote.netty.tcp.hostname",
-	  ConfigValueFactory.fromAnyRef(ContainerHostIp.load getOrElse "127.0.0.1")).
+	  ConfigValueFactory.fromAnyRef(ContainerHostIp.load() getOrElse "127.0.0.1")).
         withValue("akka.remote.netty.tcp.port",
 	  ConfigValueFactory.fromAnyRef(2551)).resolve()
       )
