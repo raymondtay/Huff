@@ -88,5 +88,28 @@ object Validator {
         case (wrongV@Invalid(_), Valid(_)) ⇒ wrongV
         case (Invalid(e1), Invalid(e2))    ⇒ Invalid(Semigroup[E].combine(e1, e2))
       }
+
+  def getHuffConfig(config: Config) : ValidatedNel[ConfigError, HuffConfig] = 
+    Apply[ValidatedNel[ConfigError, ?]].map6(
+      config.parse[String] ("DL_CLUSTER_NAME").toValidatedNel,
+      config.parse[Int]    ("DL_CLUSTER_PORT").toValidatedNel,
+      config.parse[Boolean]("IS_SEED").toValidatedNel,
+      config.parse[String] ("DL_CLUSTER_SEED_NODE").toValidatedNel,
+      config.parse[String] ("DL_HTTP_ADDRESS").toValidatedNel,
+      config.parse[Int]    ("DL_HTTP_PORT").toValidatedNel) {
+        case (clusterName, clusterPort, isSeed, dlClusterSeedNode, httpAddr, httpPort) ⇒ 
+          val ip = deeplabs.cluster.ContainerHostIp.load() getOrElse "127.0.0.1"
+          val seedNodeStrings = 
+            dlClusterSeedNode.isEmpty match {
+              case true ⇒ 
+                Seq(s"""akka.cluster.seed-nodes += "akka.tcp://$clusterName@$ip:$clusterPort"""")
+              case false ⇒ 
+                Seq(s"""akka.cluster.seed-nodes += "akka.tcp://$clusterName@$ip:$clusterPort"""",
+                    s"""akka.cluster.seed-nodes += "akka.tcp://$clusterName@$dlClusterSeedNode"""")
+            }
+
+          HuffConfig(clusterName, clusterPort, isSeed, seedNodeStrings, httpAddr, httpPort)
+      }
+
 } 
 

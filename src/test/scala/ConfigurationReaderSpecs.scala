@@ -34,6 +34,23 @@ object Config extends Properties("ConfigurationProperties") {
      keys <- containerOfN[List,Int](values.size, arbitrary[Int])
    } yield keys.map(_.toString).zip(values).toMap
 
+  property("parsing system-env variables w.r.t HuffConfig") = 
+    forAll {
+      (clName: String, clPort: Int, isSeed: Boolean, seedNode:String, httpAddr:String, httpPort:Int) ⇒ 
+        val map = Map(
+          "DL_CLUSTER_NAME"      -> clName,
+          "DL_CLUSTER_PORT"      -> clPort.toString,
+          "IS_SEED"              -> isSeed.toString,
+          "DL_CLUSTER_SEED_NODE" -> seedNode,
+          "DL_HTTP_ADDRESS"      -> httpAddr,
+          "DL_HTTP_PORT"         -> httpPort.toString
+          )
+        val c = deeplabs.config.Config(map)
+          deeplabs.config.Validator.getHuffConfig(c) match {
+            case Valid(deeplabs.config.HuffConfig(_,_,_,_,_,_)) ⇒ true
+            case _ ⇒ false
+          }
+    }
   property("parsing map of K:String keys, V:Int values") = 
     forAll(genMap(alphabetStrings)) {
       map ⇒ 

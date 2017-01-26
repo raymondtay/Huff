@@ -37,34 +37,12 @@ object Huff extends App {
 
   import Validator._
 
-  def getHuffConfig : ValidatedNel[ConfigError, HuffConfig] = 
-    Apply[ValidatedNel[ConfigError, ?]].map6(
-      systemEnvConfig.parse[String]("DL_CLUSTER_NAME").toValidatedNel,
-      systemEnvConfig.parse[Int]("DL_CLUSTER_PORT").toValidatedNel,
-      systemEnvConfig.parse[Boolean]("IS_SEED").toValidatedNel,
-      systemEnvConfig.parse[String]("DL_CLUSTER_SEED_NODE").toValidatedNel,
-      systemEnvConfig.parse[String]("DL_HTTP_ADDRESS").toValidatedNel,
-      systemEnvConfig.parse[Int]("DL_HTTP_PORT").toValidatedNel) {
-        case (clusterName, clusterPort, isSeed, dlClusterSeedNode, httpAddr, httpPort) ⇒ 
-          val ip = ContainerHostIp.load() getOrElse "127.0.0.1"
-          val seedNodeStrings = 
-            dlClusterSeedNode.isEmpty match {
-              case true ⇒ 
-                Seq(s"""akka.cluster.seed-nodes += "akka.tcp://$clusterName@$ip:$clusterPort"""")
-              case false ⇒ 
-                Seq(s"""akka.cluster.seed-nodes += "akka.tcp://$clusterName@$ip:$clusterPort"""",
-                    s"""akka.cluster.seed-nodes += "akka.tcp://$clusterName@$dlClusterSeedNode"""")
-            }
-
-          HuffConfig(clusterName, clusterPort, isSeed, seedNodeStrings, httpAddr, httpPort)
-      }
-
   //
   // The cluster node is only started when the configuration is 
   // valid and correct; otherwise, the logs would capture
   //
   for {
-    c <- getHuffConfig
+    c <- getHuffConfig(systemEnvConfig)
   } {
     val data = DLLog(
       service_name = "Huff cluster",
