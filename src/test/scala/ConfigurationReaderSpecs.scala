@@ -23,6 +23,12 @@ object Config extends Properties("ConfigurationProperties") {
   def intStrings : List[String] = 
     (1 to 1000).map(_.toString).toList
 
+  def someIntNsomeNonIntStrings = 
+    Gen.frequency(
+      (50, "12ab"),
+      (50, choose(0,100).map(_.toString))
+    )
+
   // generate Map[String,String]
   def genMap(values: List[String]): Gen[Map[String,String]] = for {
      keys <- containerOfN[List,Int](values.size, arbitrary[Int])
@@ -40,6 +46,19 @@ object Config extends Properties("ConfigurationProperties") {
 	    case true ⇒ true
 	    case false ⇒ false
 	  }
+        }
+    }
+
+  // using a frequency generator to `inject`
+  // certain values at test-time.
+  property("parsing map of K:Int keys, V:{non-Int,Int} values") = 
+    forAll(someIntNsomeNonIntStrings) {
+      s:String ⇒ 
+        val c = deeplabs.config.Config(Map(1.toString -> s))
+        c.parse[Int](1.toString) match {
+          case Valid(v) ⇒ true // expecting this to be true
+          case Invalid(ParseError(_)) ⇒ true // expecting this to be true
+          case Invalid(MissingConfig(_)) ⇒  false // ignoring this since its covered 
         }
     }
 
@@ -70,6 +89,28 @@ object Config extends Properties("ConfigurationProperties") {
             case true ⇒ true
             case false ⇒ false
           }
+        }
+    }
+
+  // value generator using a frequency alogrithm
+  // so that there's a deterministic way to generate
+  // random values at runtime.
+  val allowedValuesGen = Gen.frequency(
+    (4,"true"),
+    (4,"false"),
+    (3,"yes"),
+    (3,"no"), 
+    (2, "1"),
+    (3, "0")
+  )
+
+  property("parsing errors in allowed values ∈ configuration should be detected") =
+    forAll(allowedValuesGen) {
+      s:String ⇒ 
+        val c = deeplabs.config.Config(Map(1.toString -> s))
+        c.parse[Boolean](1.toString).isValid match {
+          case true ⇒ true
+          case false ⇒ false
         }
     }
 
