@@ -95,6 +95,10 @@ doctestMarkdownEnabled  := true
 // Coverage enabled
 // Note: Its rather nonsense to have to test whether the server starts up or not.
 //       therefore they are disabled 
+// Its important to set coverageEnabled := false when ready for packaging and distribution
+// [info] The new value will be used by *:libraryDependencies, compile:compile::scalacOptions
+// [info] Reapplying settings...
+// [info] Set current project to Huff (in build file:/Users/tayboonl/Huff/)
 coverageEnabled := true
 coverageExcludedPackages := "deeplabs\\.http\\.RestServer;deeplabs\\.cluster\\.Huff.*"
 

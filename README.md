@@ -77,6 +77,15 @@ modes:
 - As a `development` machine
 - As a `production` machine (To be announced at a later date)
 
+In either modes, it is important to set `coverageEnabled` to `false` 
+in `sbt` before you package `Huff` for service e.g. this is an example of what should happen 
+when building from source:
+```
+set coverageEnabled := false
+[info] The new value will be used by *:libraryDependencies, compile:compile::scalacOptions
+[info] Reapplying settings...
+[info] Set current project to Huff (in build file:/Users/tayboonl/Huff/)
+```
 ## Run-As-A-Development environment ( meant for *local* development only ) 
 
 Using `docker` as the approach, we would first need a docker container

@@ -64,6 +64,7 @@ object Huff extends App {
     implicit val actorMaterializer = ActorMaterializer()
     actorSystem.actorOf(Props[HuffListener], name = "HuffListener")
     val server = new RestServer()
+    server.startServer(c.hostname, c.listeningPort)
   }
 }
 
