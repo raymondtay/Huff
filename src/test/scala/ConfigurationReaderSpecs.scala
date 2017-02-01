@@ -12,6 +12,7 @@ import Prop.{forAll, throws, AnyOperators}
 import cats.data.NonEmptyList
 import cats.data.Validated.{Invalid, Valid}
 import deeplabs.config.{ConfigError, ParseError, MissingConfig}
+import scala.concurrent.duration.{Duration,FiniteDuration}
 
 object Config extends Properties("ConfigurationProperties") {
 
@@ -19,6 +20,19 @@ object Config extends Properties("ConfigurationProperties") {
   def alphabetStrings : List[String] = 
     ('a' to 'z').inits.map(_.mkString).toList
 
+  def validtimeFormattedStrings = 
+    Gen.frequency(
+      (10, "1 s"),
+      (10, "1 ms"),
+      (10, "1 min")
+      )
+ 
+  def invalidtimeFormattedStrings = 
+    Gen.frequency(
+      (10, " s"),
+      (10, " ms"),
+      (10, " min")
+      )
   // generate strings of test 
   def intStrings : List[String] = 
     (1 to 1000).map(_.toString).toList
@@ -143,6 +157,26 @@ object Config extends Properties("ConfigurationProperties") {
             case true ⇒ true
             case false ⇒ false
           }
+        }
+    }
+
+  property("valid keys with parsing errors in non-Duration values ∈ configuration should be detected") =
+    forAll(validtimeFormattedStrings) {
+      s:String ⇒ 
+        val c = deeplabs.config.Config(Map(1.toString -> s))
+        c.parse[FiniteDuration](1.toString).isValid match {
+          case true ⇒ true
+          case false ⇒ false
+        }
+    }
+
+  property("valid keys with no parsing errors w.r.t Duration values ∈ configuration should be detected") =
+    forAll(invalidtimeFormattedStrings) {
+      s:String ⇒ 
+        val c = deeplabs.config.Config(Map(1.toString -> s))
+        c.parse[FiniteDuration](1.toString).isInvalid match {
+          case true ⇒ true
+          case false ⇒ false
         }
     }
 

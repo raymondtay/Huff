@@ -36,6 +36,7 @@ object Huff extends App {
   val systemEnvConfig = Config(sys.env)
 
   import Validator._
+  import scala.concurrent.duration._
 
   //
   // The cluster node is only started when the configuration is 
@@ -51,8 +52,7 @@ object Huff extends App {
       message      = s"Starting up Http service: ${c.listeningPort}"
       )
     logger.info(data.asJson.noSpaces)
-    implicit val actorSystem = 
-      ActorSystem(c.clusterName, 
+    val config = 
         ConfigFactory.load().
         withValue("akka.cluster.seed-nodes",
 	  ConfigFactory.parseString(c.seedNodes.mkString("\n")) resolve() getList("akka.cluster.seed-nodes")).
@@ -60,14 +60,50 @@ object Huff extends App {
 	  ConfigValueFactory.fromAnyRef(ContainerHostIp.load() getOrElse "127.0.0.1")).
         withValue("akka.remote.netty.tcp.port",
 	  ConfigValueFactory.fromAnyRef(2551)).resolve()
-      )
+      
+    implicit val actorSystem = 
+      ActorSystem(c.clusterName, config)
+
     implicit val actorMaterializer = ActorMaterializer()
     actorSystem.actorOf(Props[HuffListener], name = "HuffListener")
+
+    for {
+      heartBeat <- getHuffHeartbeatConfig(Config(ScalaCfg.heartBeatCfg(config)))
+    } {
+      actorSystem.actorOf(Props(classOf[Heartbeat], heartBeat.initialDelay, heartBeat.interval, heartBeat.message))
+    } 
+
     val server = new RestServer()
     server.startServer(c.hostname, c.listeningPort)
   }
 }
 
+/** 
+ Heartbeat -
+  This actor would schedule a heartbeat message
+  with a frequency
+*/
+class Heartbeat(
+  val initialDelay : scala.concurrent.duration.FiniteDuration,
+  val interval     : scala.concurrent.duration.FiniteDuration, 
+  val heartBeatMsg : String) extends Actor with ActorLogging {
+
+  import deeplabs.http.json.DLLog
+  import scala.concurrent.duration._
+  import context.dispatcher
+  context.system.scheduler.schedule(initialDelay, interval, self, "Tick")
+  val data = DLLog(
+      service_name = "Huff Http Cluster",
+      category     = "application",
+      event_type   = "heartbeat",
+      message      = heartBeatMsg
+      )
+ 
+  def receive = {
+    case "Tick" ⇒ 
+      log.info(data.asJson.noSpaces)
+  }
+}
 /** 
  HuffListener - 
 

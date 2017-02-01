@@ -8,6 +8,7 @@ package deeplabs.config
 // @date  : 19 Jan 2017
 // 
 
+import scala.concurrent.duration.{Duration,FiniteDuration}
 import cats._
 import cats.data._
 import cats.implicits._
@@ -46,6 +47,21 @@ object Read {
         else None
       }
     }
+
+  // Note: `Duration` parses the input string based on the
+  // Scala 2.11.8's convention see [[scala.concurrent.duration.Duration]]
+  // and we make no further checks, thereafter.
+  implicit val finiteDurationRead : Read[FiniteDuration] = 
+    new Read[FiniteDuration] {
+      def read(s: String) : Option[FiniteDuration] = {
+        try {
+          val d = Duration(s)
+          Some(FiniteDuration(d.length, d.unit))
+        } catch {
+          case e: NumberFormatException ⇒ None
+        }
+      } 
+    }
 }
 
 sealed abstract class ConfigError
@@ -64,6 +80,19 @@ case class Config(map : Map[String,String]) {
     }
 }
 
+case class HuffHeartbeatConfig(
+  initialDelay : FiniteDuration,
+  interval     : FiniteDuration,
+  message : String
+)
+
+// de-serialize directly from `application.conf`
+case class HeartbeatConfig(
+  server_ip : String,
+  initial_delay: String,
+  interval : String
+)
+
 case class HuffConfig(
   clusterName: String,
   clusterPort : Int,
@@ -72,6 +101,16 @@ case class HuffConfig(
   hostname: String, 
   listeningPort: Int)
 
+object ScalaCfg {
+  import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
+  import com.github.andr83.scalaconfig._
+  def heartBeatCfg(config : com.typesafe.config.Config) = {
+    val c = config.as[HeartbeatConfig]("huff.heartbeat.message")
+    val m = config.as[Map[String,String]]("huff.heartbeat.settings")
+    m + ("message" -> c.asJson.noSpaces.toString)
+  }
+
+}
 // 
 // This object contains some helper functions which allows
 // the developer to aggregate all errors into the non-empty list
@@ -87,6 +126,15 @@ object Validator {
         case (Valid(_), wrongV@Invalid(_)) ⇒ wrongV
         case (wrongV@Invalid(_), Valid(_)) ⇒ wrongV
         case (Invalid(e1), Invalid(e2))    ⇒ Invalid(Semigroup[E].combine(e1, e2))
+      }
+
+  def getHuffHeartbeatConfig(config: Config) : ValidatedNel[ConfigError, HuffHeartbeatConfig] = 
+    Apply[ValidatedNel[ConfigError, ?]].map3(
+      config.parse[FiniteDuration]("initialdelay").toValidatedNel,
+      config.parse[FiniteDuration]("interval").toValidatedNel,
+      config.parse[String]("message").toValidatedNel) {
+        case (initialDelay, interval, message) ⇒ 
+          HuffHeartbeatConfig(initialDelay, interval, message)
       }
 
   def getHuffConfig(config: Config) : ValidatedNel[ConfigError, HuffConfig] = 

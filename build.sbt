@@ -102,6 +102,9 @@ doctestMarkdownEnabled  := true
 coverageEnabled := true
 coverageExcludedPackages := "deeplabs\\.http\\.RestServer;deeplabs\\.cluster\\.Huff.*"
 
+// Scalaconfig library
+val ScalaCfg = Seq("com.github.andr83" %% "scalaconfig" % "0.3")
+
 // 
 // Project settings in sbt
 // 
@@ -130,7 +133,7 @@ val project = Project(
         "-Xlint:unchecked",
         "-Xlint:deprecation"),
     libraryDependencies ++= 
-      CatsEffDeps ++ CliDeps ++ CirceDeps ++ AkkaDeps ++ AkkaHttpDeps ++ ScalaLoggerDeps ++ TestingDeps,
+      CatsEffDeps ++ CliDeps ++ CirceDeps ++ AkkaDeps ++ AkkaHttpDeps ++ ScalaCfg ++ ScalaLoggerDeps ++ TestingDeps,
 
     javaOptions in run ++= Seq( // javaOptions when project is being run
       "-Xms1024m",
