@@ -93,6 +93,9 @@ case class HeartbeatConfig(
   interval : String
 )
 
+// @see section `huff.consul` in `application.conf`
+case class HuffConsulConfig(enabled : Boolean, hostname:String, port: Int, serviceName: String, serviceTagName: String)
+
 case class HuffConfig(
   clusterName: String,
   clusterPort : Int,
@@ -109,7 +112,9 @@ object ScalaCfg {
     val m = config.as[Map[String,String]]("huff.heartbeat.settings")
     m + ("message" -> c.asJson.noSpaces.toString)
   }
-
+  def consulCfg(config : com.typesafe.config.Config) = {
+    config.as[Map[String,String]]("huff.consul")  
+  }
 }
 // 
 // This object contains some helper functions which allows
@@ -126,6 +131,17 @@ object Validator {
         case (Valid(_), wrongV@Invalid(_)) ⇒ wrongV
         case (wrongV@Invalid(_), Valid(_)) ⇒ wrongV
         case (Invalid(e1), Invalid(e2))    ⇒ Invalid(Semigroup[E].combine(e1, e2))
+      }
+
+  def getHuffConsulConfig(config: Config) : ValidatedNel[ConfigError, HuffConsulConfig] = 
+    Apply[ValidatedNel[ConfigError, ?]].map5(
+      config.parse[Boolean]("enabled").toValidatedNel,
+      config.parse[String]("host").toValidatedNel,
+      config.parse[Int]("port").toValidatedNel, 
+      config.parse[String]("service_name").toValidatedNel,
+      config.parse[String]("tag_name").toValidatedNel) {
+        case (enabled, consulHostname, consulPort, serviceName, serviceTagName) ⇒ 
+          HuffConsulConfig(enabled, consulHostname, consulPort, serviceName, serviceTagName)
       }
 
   def getHuffHeartbeatConfig(config: Config) : ValidatedNel[ConfigError, HuffHeartbeatConfig] = 

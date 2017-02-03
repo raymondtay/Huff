@@ -7,7 +7,7 @@ package deeplabs.cluster
   to serve client requests.
  */
 
-import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
+import akka.actor.{Actor, ActorLogging, ActorSystem, Cancellable, Props}
 import akka.stream.ActorMaterializer
 import akka.http.scaladsl.Http
 import akka.cluster.{Cluster, ClusterEvent}
@@ -15,6 +15,7 @@ import ClusterEvent._
 import com.typesafe.config.{ConfigFactory, ConfigValueFactory}
 import com.typesafe.scalalogging._
 
+import com.orbitz.consul.option.{ConsistencyMode, ImmutableQueryOptions}
 import cats._
 import cats.data._
 import cats.implicits._
@@ -52,20 +53,12 @@ object Huff extends App {
       message      = s"Starting up Http service: ${c.listeningPort}"
       )
     logger.info(data.asJson.noSpaces)
-    val config = 
-        ConfigFactory.load().
-        withValue("akka.cluster.seed-nodes",
-	  ConfigFactory.parseString(c.seedNodes.mkString("\n")) resolve() getList("akka.cluster.seed-nodes")).
-        withValue("akka.remote.netty.tcp.hostname",
-	  ConfigValueFactory.fromAnyRef(ContainerHostIp.load() getOrElse "127.0.0.1")).
-        withValue("akka.remote.netty.tcp.port",
-	  ConfigValueFactory.fromAnyRef(2551)).resolve()
+    val config = ConfigFactory.load().resolve()
       
-    implicit val actorSystem = 
-      ActorSystem(c.clusterName, config)
+    implicit val actorSystem = ActorSystem(c.clusterName, config)
 
     implicit val actorMaterializer = ActorMaterializer()
-    actorSystem.actorOf(Props[HuffListener], name = "HuffListener")
+    actorSystem.actorOf(Props(classOf[HuffListener], config), name = "HuffListener")
 
     for {
       heartBeat <- getHuffHeartbeatConfig(Config(ScalaCfg.heartBeatCfg(config)))
@@ -117,8 +110,14 @@ class Heartbeat(
          e.g. running database / file IO actions
 
  */
-class HuffListener extends Actor with ActorLogging {
+class HuffListener(config: com.typesafe.config.Config) extends Actor with ActorLogging {
+  import scala.collection.JavaConversions._
+  import scala.concurrent._
+  import scala.concurrent.duration._
+  import scala.concurrent.ExecutionContext.Implicits.global
+
   val cluster = Cluster(context.system)
+
   override def preStart() = {
     cluster.subscribe(self,
       initialStateMode = InitialStateAsEvents,
@@ -133,6 +132,51 @@ class HuffListener extends Actor with ActorLogging {
       log.info(s"event_type : cluster, msg : 'member @'${member.address} is NOT-REACHABLE''")
     case MemberRemoved(member, previousStatus) ⇒
       log.info(s"event_type : cluster, msg : 'member @'${member.address} is REMOVED''")
+    case MemberJoined(member) ⇒ 
+      log.info(s"member joined : $member")
     case _ : MemberEvent ⇒  // ignore
   }
+
+  val (consulCfg, consulApi) = ConsulApi(config).toOption.head
+
+  val consulEnabled = consulCfg.enabled 
+
+  // This callback is triggered iff all members of the cluster
+  // are up.
+  cluster.registerOnMemberUp {
+    log.info("Cluster is ready!")
+    huffScheduler.cancel()
+  }
+
+  // 
+  // This is the action that invokes the call to the Consul.io interface
+  // and retrieves the healthy nodes and commands them to join the 
+  // cluster.
+  // 
+  val huffScheduler : Cancellable =
+    context.system.scheduler.schedule(10 seconds, 30 seconds, new Runnable {
+      override def run() : Unit = {
+
+        val selfAddress = cluster.selfAddress
+
+        log.debug(s"Bootstrapping, self address : $selfAddress")
+        def getServiceAddresses(implicit actorSystem: ActorSystem = context.system): List[akka.actor.Address] = {
+          val queryOpts = ImmutableQueryOptions.builder().consistencyMode(ConsistencyMode.CONSISTENT).build()
+
+          val serviceNodes = consulApi.healthClient().getHealthyServiceInstances(consulCfg.serviceName, queryOpts)
+          serviceNodes.getResponse.toList map { node ⇒
+            akka.actor.Address("akka.tcp", actorSystem.name, node.getService.getAddress, node.getService.getPort)
+          }
+        }
+
+        val serviceSeeds = if (consulEnabled) {
+	  val serviceAddresses = getServiceAddresses
+
+	  serviceAddresses filter { address ⇒ 
+	    address != selfAddress || address == serviceAddresses.head
+	  }
+	} else List(selfAddress)
+        cluster.joinSeedNodes(serviceSeeds)
+      }
+    })
 }

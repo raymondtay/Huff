@@ -105,6 +105,9 @@ coverageExcludedPackages := "deeplabs\\.http\\.RestServer;deeplabs\\.cluster\\.H
 // Scalaconfig library
 val ScalaCfg = Seq("com.github.andr83" %% "scalaconfig" % "0.3")
 
+val ConsulDeps = Seq("com.orbitz.consul" % "consul-client" % "0.13.10")
+resolvers += "bintray" at "http://jcenter.bintray.com"
+
 // 
 // Project settings in sbt
 // 
@@ -133,7 +136,7 @@ val project = Project(
         "-Xlint:unchecked",
         "-Xlint:deprecation"),
     libraryDependencies ++= 
-      CatsEffDeps ++ CliDeps ++ CirceDeps ++ AkkaDeps ++ AkkaHttpDeps ++ ScalaCfg ++ ScalaLoggerDeps ++ TestingDeps,
+      CatsEffDeps ++ CliDeps ++ CirceDeps ++ AkkaDeps ++ AkkaHttpDeps ++ ConsulDeps ++ ScalaCfg ++ ScalaLoggerDeps ++ TestingDeps,
 
     javaOptions in run ++= Seq( // javaOptions when project is being run
       "-Xms1024m",
@@ -142,9 +145,9 @@ val project = Project(
       "-server", 
       "-XX:+UseCompressedOops",
       "-Djava.library.path=./target/native",
-      s"-Dcom.sun.management.jmxremote.port=${sys.props.getOrElse("JMX_REMOTE_PORT", default = "9999")}",
-      s"-Dcom.sun.management.jmxremote.ssl=${sys.props.getOrElse("JMX_REMOTE_SSL", default = "false")}",
-      s"-Dcom.sun.management.jmxremote.authenticate=${sys.props.getOrElse("JMX_REMOTE_AUTHENTICATE", default = "false")}"
+      s"-Dcom.sun.management.jmxremote.port=${sys.env.getOrElse("JMX_REMOTE_PORT", default = "9999")}",
+      s"-Dcom.sun.management.jmxremote.ssl=${sys.env.getOrElse("JMX_REMOTE_SSL", default = "false")}",
+      s"-Dcom.sun.management.jmxremote.authenticate=${sys.env.getOrElse("JMX_REMOTE_AUTHENTICATE", default = "false")}"
       ),
     javaOptions in Universal := (javaOptions in run).value, // propagate `run` settings to packaged scripts
     Keys.fork in run := true,
