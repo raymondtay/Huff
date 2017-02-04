@@ -8,10 +8,16 @@ Huff is a peer-to-peer clustering solution that provides the following functiona
 
 # Updates
 
+- 4  Feb 2017
+ - Service discovery [consul.io](http://consul.io) is added to `Huff` in cluster mode. 
+ - `Huff` can now run via `docker-compose` which starts up 3 `consul.io` agents in server mode; together with 3 `Huff` agents as a `akka-cluster`.
+- 3 Feb 2017
+ - Service discovery [consul.io](http://consul.io) is added to `Huff` in single-node mode.
+ - `Huff` can run _natively_ as a `akka-cluster` and integrated with `consul.io`.
 - 23 Jan 2017 
--- Potential memory leak from a DDOS targeting `akka-http` 
+ - Potential memory leak from a DDOS targeting `akka-http` 
    was discovered [here](http://akka.io/news/2017/01/23/akka-http-10.0.2-security-fix-released.html)
--- Bumping version of `akka-http` from `10.0.1` to `10.0.2`
+ - Bumping version of `akka-http` from `10.0.1` to `10.0.2`
 
 # Running locally
 
