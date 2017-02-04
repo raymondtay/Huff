@@ -1,0 +1,96 @@
+version: '2'
+services:
+  consul1:
+    image: consul:latest
+    command: consul agent -server -client=0.0.0.0 -bootstrap-expect=3 -config-file=/tmp/cluster-docker.json -data-dir=/tmp/consul -ui
+    hostname: consul1
+    ports:
+      - "8301:8300"
+      - "8401:8400"
+      - "8501:8500"
+      - "8601:8600"
+      - "9001:9001"
+
+  consul2:
+    image: consul:latest
+    command: consul agent -server -client=0.0.0.0 -bootstrap-expect=3 -rejoin -retry-join=consul1 -data-dir=/tmp/consul -ui
+    hostname: consul2
+    links:
+      - consul1
+    ports:
+      - "8302:8300"
+      - "8402:8400"
+      - "8502:8500"
+      - "8602:8600"
+      - "9002:9001"
+
+  consul3:
+    image: consul:latest
+    command: consul agent -server -client=0.0.0.0 -bootstrap-expect=3 -rejoin -retry-join=consul1 -data-dir=/tmp/consul -ui
+    hostname: consul3
+    links:
+      - consul1
+    ports:
+      - "8303:8300"
+      - "8403:8400"
+      - "8503:8500"
+      - "8603:8600"
+      - "9003:9001"
+
+  huff-cluster-demo1:
+    image: huff:latest
+    hostname: huff-cluster-demo1
+    links:
+      - consul1
+      - huff-cluster-demo2
+      - huff-cluster-demo3
+    ports:
+      - "8080:8080"
+      - "2551:2551"
+    environment:
+      - CONSUL_HOST=consul1
+      - DL_CLUSTER_name=huffcluster
+      - DL_CLUSTER_ADDRESS=huff-cluster-demo1
+      - IS_SEED=yes
+      - DL_HTTP_ADDRESS=huff-cluster-demo1
+      - DL_HTTP_PORT=8080
+      - DL_CLUSTER_SEED_NODE=""
+      - DL_CLUSTER_PORT=2551
+
+  huff-cluster-demo2:
+    image: huff:latest
+    hostname: huff-cluster-demo2
+    links:
+      - consul1
+      - huff-cluster-demo3
+    ports:
+      - "8081:8080"
+      - "2552:2551"
+    environment:
+      - CONSUL_HOST=consul1
+      - DL_CLUSTER_name=huffcluster
+      - DL_CLUSTER_ADDRESS=huff-cluster-demo2
+      - IS_SEED=yes
+      - DL_HTTP_ADDRESS=huff-cluster-demo2
+      - DL_HTTP_PORT=8080
+      - DL_CLUSTER_SEED_NODE=""
+      - DL_CLUSTER_PORT=2551
+
+  huff-cluster-demo3:
+    image: huff:latest
+    hostname: huff-cluster-demo3
+    links:
+      - consul1
+    ports:
+      - "8082:8080"
+      - "2553:2551"
+    environment:
+      - CONSUL_HOST=consul1
+      - DL_CLUSTER_name=huffcluster
+      - DL_CLUSTER_ADDRESS=huff-cluster-demo3
+      - IS_SEED=yes
+      - DL_HTTP_ADDRESS=huff-cluster-demo3
+      - DL_HTTP_PORT=8080
+      - DL_CLUSTER_SEED_NODE=""
+      - DL_CLUSTER_PORT=2551
+

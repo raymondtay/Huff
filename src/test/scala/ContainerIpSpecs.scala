@@ -34,5 +34,38 @@ object ContainerHostIpSpecs extends Properties("ContainerHostIpProperties") {
           case _        ⇒ false
         }
     }
+
+  // Examples are extracted from [https://www.ietf.org/rfc/rfc2732.txt]
+  val validAddresses =
+    Gen.frequency(
+      (10, "localhost"),
+      (10,"FEDC:BA98:7654:3210:FEDC:BA98:7654:3210"),
+      (10,"1080:0:0:0:8:800:200C:4171"),
+      (10,"3ffe:2a00:100:7031::1"),
+      (10,"1080::8:800:200C:417A"),
+      (10,"::192.9.5.5"),
+      (10,"::FFFF:129.144.52.38"),
+      (10,"2010:836B:4179::836B:4179"))
+
+  val genInvalidAddresses =
+    oneOf(List("0.0.0.0.0"))
+
+  property("any node with valid ipv4 should return an String") =
+    forAll(validAddresses) {
+      host:String ⇒
+        ContainerHostIp.getIpByHostname(host).isRight match {
+	  case true ⇒ true
+	  case false ⇒ false
+	}
+    }
+
+  property("any node with invalid ipv4 addresses should throw an 'java.net.UnknownHostException'") =
+    forAll(genInvalidAddresses) {
+      host:String ⇒
+        ContainerHostIp.getIpByHostname(host).isLeft match {
+	  case true ⇒ true
+	  case false ⇒ false
+	}
+    }
 }
 

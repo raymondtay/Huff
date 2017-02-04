@@ -1,0 +1,67 @@
+{
+  "services": [
+
+  {
+  "id": "cluster-0",
+  "name": "huff-rest-service",
+  "tags": ["http-cluster"],
+  "address": "huff-cluster-demo1",
+  "port": 2551,
+  "enableTagOverride": false,
+  "checks": [
+    {
+    "http" : "http://huff-cluster-demo1:8080/status",
+    "interval" : "15s",
+    "timeout" : "1s"
+    },
+    {
+      "tcp" : "huff-cluster-demo1:2551",
+      "interval" : "15s",
+      "timeout" : "1s"
+    }
+  ]
+  },
+  {
+    "id" : "cluster-1",
+    "name" : "huff-rest-service",
+    "tags" : ["http-cluster"],
+    "address" : "huff-cluster-demo2",
+    "port" : 2551,
+    "enableTagOverride": false,
+    "checks" : [
+      {
+      "http" : "http://huff-cluster-demo2:8080/status",
+      "interval" : "15s",
+      "timeout" : "1s"
+      },
+      {
+        "tcp" : "huff-cluster-demo2:2551",
+        "interval" : "15s",
+        "timeout" : "1s"
+      }
+    ]
+  },
+  {
+    "id" : "cluster-2",
+    "name" : "huff-rest-service",
+    "tags" : ["http-cluster"],
+    "address" : "huff-cluster-demo3",
+    "port" : 2551,
+    "enableTagOverride": false,
+    "checks":[ 
+      {
+        "http" : "http://huff-cluster-demo3:8080/status",
+        "interval" : "15s",
+        "timeout" : "1s"
+      },
+      {
+          "tcp" : "huff-cluster-demo3:2551",
+          "interval" : "15s",
+          "timeout" : "1s"
+      }
+    ]
+  }
+  ]
+}
+
+

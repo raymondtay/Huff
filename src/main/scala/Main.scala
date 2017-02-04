@@ -53,7 +53,11 @@ object Huff extends App {
       message      = s"Starting up Http service: ${c.listeningPort}"
       )
     logger.info(data.asJson.noSpaces)
-    val config = ConfigFactory.load().resolve()
+    val config = ConfigFactory.load().
+      withValue("akka.remote.netty.tcp.bind-hostname",
+            ConfigValueFactory.fromAnyRef(ContainerHostIp.load() getOrElse "127.0.0.1")).
+      withValue("akka.remote.netty.tcp.hostname",
+            ConfigValueFactory.fromAnyRef(ContainerHostIp.load() getOrElse "127.0.0.1")).resolve()
       
     implicit val actorSystem = ActorSystem(c.clusterName, config)
 
@@ -165,7 +169,13 @@ class HuffListener(config: com.typesafe.config.Config) extends Actor with ActorL
 
           val serviceNodes = consulApi.healthClient().getHealthyServiceInstances(consulCfg.serviceName, queryOpts)
           serviceNodes.getResponse.toList map { node ⇒
-            akka.actor.Address("akka.tcp", actorSystem.name, node.getService.getAddress, node.getService.getPort)
+	    ContainerHostIp.getIpByHostname(node.getService.getAddress) match {
+	      case Left(e) ⇒ 
+	        log.error(s"Cannot resolve the IP address, detailed message : {${e.getMessage}}")
+		throw e
+	      case Right(ip) ⇒ 
+                akka.actor.Address("akka.tcp", actorSystem.name, ip, node.getService.getPort)
+	    }
           }
         }
 
