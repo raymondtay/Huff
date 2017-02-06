@@ -4,29 +4,22 @@ import org.scalacheck.{Arbitrary, Gen, Properties,Prop}
 import Arbitrary.arbitrary
 import Gen.{containerOfN, choose, pick, mapOf, listOf, oneOf}
 import Prop.{forAll, throws, AnyOperators}
-import cats.data.Validated.{Invalid, Valid}
 import deeplabs.config.{ConfigError, ParseError, MissingConfig}
 import com.typesafe.config.{Config, ConfigFactory}
+import org.specs2.specification._
+import org.specs2._
+import scala.language.postfixOps
 
-//
-// Downside of this test for now is that it requires a 
-// valid consul.io agent to be available running on the localhost
-// or whatever the IP addresses defined in the configuration
-// section `huff.consul.host`.
-// 
-object ConsulApiSpecs extends Properties("ConsulApiProperties") {
+class ConsulIOApiSpecs extends Specification with BeforeAll with AfterAll with ScalaCheck {
 
-  // TODO
-  // - Factor this test so that it becomes part of the setup
-  //   and remove the teardown from the buildfile.
-  //
-  new Thread(new Runnable() {
-    override def run() : Unit = {
-      import sys.process._
-      import scala.language.postfixOps
-      s"consul agent -dev"! 
-    }
-  }).start()
+  private[this] var consulproc : sys.process.Process = _
+
+  override def beforeAll() = {
+    import sys.process._
+    consulproc = stringToProcess("consul agent -dev").run()
+  }
+
+  override def afterAll() = consulproc.destroy()
 
   val testConfs : Seq[com.typesafe.config.Config] = Seq(
     ConfigFactory.parseString("""
@@ -61,9 +54,14 @@ object ConsulApiSpecs extends Properties("ConsulApiProperties") {
     """)
   )
 
-  property("A valid/invalid configuration that points to a valid/invalid consul.io agent should be caught by the checks.") = 
-    forAll(oneOf(testConfs)) {
-      conf:com.typesafe.config.Config ⇒ 
+  implicit val genArbitraryConfig = Arbitrary(Gen.oneOf(testConfs))
+  def is = s2"""
+     All consul.io configurations will be validated and represented as either Valid or Invalid values in `cats.data.Validated` $configuratorValidator 
+  """
+
+  def configuratorValidator = 
+    prop(
+      (conf:com.typesafe.config.Config) ⇒ 
       ConsulApi(conf).isValid match {
         case true ⇒ true
         case false ⇒  // when its invalid, then it means it picked up a configuration that couldn't be parsed properly
@@ -72,6 +70,7 @@ object ConsulApiSpecs extends Properties("ConsulApiProperties") {
             case false ⇒ false // its not likely we would EVER hit this in this testing as it would mean its a REAL error in CATS
           }
       }
-    }
+    )
+    
 }
 
