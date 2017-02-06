@@ -16,6 +16,17 @@ import com.typesafe.config.{Config, ConfigFactory}
 // 
 object ConsulApiSpecs extends Properties("ConsulApiProperties") {
 
+  // TODO
+  // - Factor this test so that it becomes part of the setup
+  //   and remove the teardown from the buildfile.
+  //
+  new Thread(new Runnable() {
+    override def run() : Unit = {
+      import sys.process._
+      s"consul agent -dev"! 
+    }
+  }).start()
+
   val testConfs : Seq[com.typesafe.config.Config] = Seq(
     ConfigFactory.parseString("""
     huff.consul.enabled = true

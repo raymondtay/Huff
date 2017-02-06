@@ -151,6 +151,7 @@ val project = Project(
       ),
     javaOptions in Universal := (javaOptions in run).value, // propagate `run` settings to packaged scripts
     Keys.fork in run := true,
+    testOptions in Test += Tests.Cleanup( () ⇒ s"sh ${sys.env("HOME")}/Huff/scripts/remove_consul_after_tests.sh" !),
     mainClass in (Compile, run) := Some("deeplabs.cluster.Huff")
   ) // end of project's settings
     
