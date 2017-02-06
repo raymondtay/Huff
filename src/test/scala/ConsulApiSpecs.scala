@@ -23,6 +23,7 @@ object ConsulApiSpecs extends Properties("ConsulApiProperties") {
   new Thread(new Runnable() {
     override def run() : Unit = {
       import sys.process._
+      import scala.language.postfixOps
       s"consul agent -dev"! 
     }
   }).start()

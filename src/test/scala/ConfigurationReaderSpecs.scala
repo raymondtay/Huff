@@ -180,12 +180,22 @@ object Config extends Properties("ConfigurationProperties") {
         }
     }
 
-  property("validator.validate tests where tuple is valid") = {
+  property("validator.validate tests where 2-tuple(s) are valid") = {
     forAll {
       (x: String, y:String) ⇒ 
         implicit val nelSemigroup: cats.Semigroup[NonEmptyList[String]] = cats.SemigroupK[NonEmptyList].algebra[String]
         deeplabs.config.Validator.validate(Valid(x), Valid(y))((_:String) ++ (_:String)) == Valid(x++y)
     }
   }
+
+  property("validator.validate tests where 2-tuples are invalid") = {
+    forAll {
+      (x: Int, y:Int) ⇒ 
+        import cats.implicits._
+        implicitly[cats.Semigroup[Int]]
+        deeplabs.config.Validator.validate(Invalid(x), Invalid(y))((_:Int) + (_:Int)) == Invalid(x+y)
+    }
+  }
+
 
 }
