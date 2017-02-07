@@ -1,6 +1,8 @@
 package deeplabs.cluster
 
+import akka.actor.{ActorSystem, Address}
 import deeplabs.config.{Config, ScalaCfg, Validator}
+import com.orbitz.consul.model.health.ServiceHealth
 
 //
 // Factory object to retrieve the interface object to the
@@ -15,6 +17,8 @@ object ConsulApi {
       config <- getHuffConsulConfig(Config(ScalaCfg.consulCfg(config)))
     } yield (config, com.orbitz.consul.Consul.builder().withUrl(s"http://${config.hostname}:${config.port}").build())
 
+  def constructActorAddress(node: ServiceHealth, actorSystemName: String) = 
+    (ip: String) ⇒ List(akka.actor.Address("akka.tcp", actorSystemName, ip, node.getService.getPort))
 }
 
 

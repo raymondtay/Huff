@@ -152,6 +152,8 @@ class HuffListener(config: com.typesafe.config.Config) extends Actor with ActorL
     huffScheduler.cancel()
   }
 
+  def logError = (e: Exception) ⇒ log.error(s"Cannot resolve the IP address, detailed message : {${e.getMessage}}")
+
   // 
   // This is the action that invokes the call to the Consul.io interface
   // and retrieves the healthy nodes and commands them to join the 
@@ -166,17 +168,14 @@ class HuffListener(config: com.typesafe.config.Config) extends Actor with ActorL
         log.debug(s"Bootstrapping, self address : $selfAddress")
         def getServiceAddresses(implicit actorSystem: ActorSystem = context.system): List[akka.actor.Address] = {
           val queryOpts = ImmutableQueryOptions.builder().consistencyMode(ConsistencyMode.CONSISTENT).build()
+          val serviceNodes =
+	    consulApi.healthClient().
+	    getHealthyServiceInstances(consulCfg.serviceName, queryOpts)
 
-          val serviceNodes = consulApi.healthClient().getHealthyServiceInstances(consulCfg.serviceName, queryOpts)
-          serviceNodes.getResponse.toList map { node ⇒
-	    ContainerHostIp.getIpByHostname(node.getService.getAddress) match {
-	      case Left(e) ⇒ 
-	        log.error(s"Cannot resolve the IP address, detailed message : {${e.getMessage}}")
-		throw e
-	      case Right(ip) ⇒ 
-                akka.actor.Address("akka.tcp", actorSystem.name, ip, node.getService.getPort)
-	    }
-          }
+          serviceNodes.getResponse.toList.map{ node ⇒
+	    ContainerHostIp.getIpByHostname(node.getService.getAddress).
+	      bimap(logError,ConsulApi.constructActorAddress(node, actorSystem.name)).toList
+          }.flatten.flatten
         }
 
         val serviceSeeds = if (consulEnabled) {
