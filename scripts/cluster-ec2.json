@@ -1,0 +1,67 @@
+{
+  "services": [
+
+  {
+  "id": "cluster-0",
+  "name": "huff-rest-service",
+  "tags": ["http-cluster"],
+  "address": "10.0.0.131",
+  "port": 2551,
+  "enableTagOverride": false,
+  "checks": [
+    {
+    "http" : "http://10.0.0.131:8080/status",
+    "interval" : "15s",
+    "timeout" : "1s"
+    },
+    {
+      "tcp" : "10.0.0.131:2551",
+      "interval" : "15s",
+      "timeout" : "1s"
+    }
+  ]
+  },
+  {
+    "id" : "cluster-1",
+    "name" : "huff-rest-service",
+    "tags" : ["http-cluster"],
+    "address" : "10.0.0.149",
+    "port" : 2551,
+    "enableTagOverride": false,
+    "checks" : [
+      {
+      "http" : "http://10.0.0.149:8080/status",
+      "interval" : "15s",
+      "timeout" : "1s"
+      },
+      {
+        "tcp" : "10.0.0.149:2551",
+        "interval" : "15s",
+        "timeout" : "1s"
+      }
+    ]
+  },
+  {
+    "id" : "cluster-2",
+    "name" : "huff-rest-service",
+    "tags" : ["http-cluster"],
+    "address" : "10.0.0.234",
+    "port" : 2551,
+    "enableTagOverride": false,
+    "checks":[ 
+      {
+        "http" : "http://10.0.0.234:8080/status",
+        "interval" : "15s",
+        "timeout" : "1s"
+      },
+      {
+          "tcp" : "10.0.0.234:2551",
+          "interval" : "15s",
+          "timeout" : "1s"
+      }
+    ]
+  }
+  ]
+}
+
+
