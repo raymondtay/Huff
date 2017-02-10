@@ -47,10 +47,10 @@ object Huff extends App {
     c <- getHuffConfig(systemEnvConfig)
   } {
     val data = DLLog(
-      service_name = "Huff cluster",
+      service_name = "Huff Cluster",
       category     = "application",
       event_type   = "operation",
-      message      = s"Starting up Http service: ${c.listeningPort}"
+      mesg         = s"Starting up Http service: ${c.listeningPort}"
       )
     logger.info(data.asJson.noSpaces)
     val config = ConfigFactory.load().
@@ -90,10 +90,10 @@ class Heartbeat(
   import context.dispatcher
   context.system.scheduler.schedule(initialDelay, interval, self, "Tick")
   val data = DLLog(
-      service_name = "Huff Http Cluster",
+      service_name = "Huff Cluster",
       category     = "application",
       event_type   = "heartbeat",
-      message      = heartBeatMsg
+      mesg         = heartBeatMsg
       )
  
   def receive = {

@@ -39,16 +39,16 @@ trait RestService {
   val logger = Logger("RestService")
 
   val data = DLLog(
-      service_name = "Huff Http Cluster",
+      service_name = "Huff Cluster",
       category     = "application",
       event_type   = "operation",
-      message      = ""
+      mesg         = ""
       )
  
   val routes : Route = 
   (get & path("status")) {
     get {
-      val d = data.copy(message = "URI: /status invoked. Ok.")
+      val d = data.copy(mesg = "URI: /status invoked. Ok.")
       logger.info(d.asJson.noSpaces)
       complete(HttpEntity(ContentTypes.`text/plain(UTF-8)`, "System-node is OK."))
     }
@@ -60,12 +60,12 @@ trait RestService {
           val fileWrite = bytes.runWith(FileIO.toPath(new File("/tmp/test.jpg").toPath))
           fileWrite.onFailure {
             case e ⇒ 
-              val d = data.copy(message = s"URI: /video invoked. Uploaded failed with exception: ${e.getMessage}")
+              val d = data.copy(mesg = s"URI: /video invoked. Uploaded failed with exception: ${e.getMessage}")
               logger.info(d.asJson.noSpaces)
           } 
  
           onComplete(fileWrite) { ioResult ⇒ 
-            val d = data.copy(message = "URI: /video invoked. Uploaded Ok.")
+            val d = data.copy(mesg = "URI: /video invoked. Uploaded Ok.")
             logger.info(d.asJson.noSpaces)
             complete(HttpEntity(ContentTypes.`text/plain(UTF-8)`, s"File IO ${ioResult} uploaded."))
           }
