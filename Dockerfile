@@ -41,12 +41,9 @@ RUN \
 # Running the process as a foreground
 WORKDIR /root/huff-0.9
 ENV DL_CLUSTER_NAME huffcluster
-ENV DL_CLUSTER_ADDRESS localhost
+ENV DL_CLUSTER_ADDRESS 0.0.0.0
 ENV DL_CLUSTER_PORT 2551
-# a string value like "" or "<host/ip>:<port>"
-ENV DL_CLUSTER_SEED_NODE ""
-ENV IS_SEED true
-ENV DL_HTTP_ADDRESS localhost
+ENV DL_HTTP_ADDRESS 0.0.0.0
 ENV DL_HTTP_PORT    8080
 # Commented out the entry point
 ENTRYPOINT ["./bin/huff"]

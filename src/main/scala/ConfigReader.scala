@@ -99,8 +99,7 @@ case class HuffConsulConfig(enabled : Boolean, hostname:String, port: Int, servi
 case class HuffConfig(
   clusterName: String,
   clusterPort : Int,
-  isSeed : Boolean,
-  seedNodes : Seq[String], 
+  clusterAddress : String, 
   hostname: String, 
   listeningPort: Int)
 
@@ -154,25 +153,14 @@ object Validator {
       }
 
   def getHuffConfig(config: Config) : ValidatedNel[ConfigError, HuffConfig] = 
-    Apply[ValidatedNel[ConfigError, ?]].map6(
+    Apply[ValidatedNel[ConfigError, ?]].map5(
       config.parse[String] ("DL_CLUSTER_NAME").toValidatedNel,
       config.parse[Int]    ("DL_CLUSTER_PORT").toValidatedNel,
-      config.parse[Boolean]("IS_SEED").toValidatedNel,
-      config.parse[String] ("DL_CLUSTER_SEED_NODE").toValidatedNel,
+      config.parse[String] ("DL_CLUSTER_ADDRESS").toValidatedNel,
       config.parse[String] ("DL_HTTP_ADDRESS").toValidatedNel,
       config.parse[Int]    ("DL_HTTP_PORT").toValidatedNel) {
-        case (clusterName, clusterPort, isSeed, dlClusterSeedNode, httpAddr, httpPort) ⇒ 
-          val ip = deeplabs.cluster.ContainerHostIp.load() getOrElse "127.0.0.1"
-          val seedNodeStrings = 
-            dlClusterSeedNode.isEmpty match {
-              case true ⇒ 
-                Seq(s"""akka.cluster.seed-nodes += "akka.tcp://$clusterName@$ip:$clusterPort"""")
-              case false ⇒ 
-                Seq(s"""akka.cluster.seed-nodes += "akka.tcp://$clusterName@$ip:$clusterPort"""",
-                    s"""akka.cluster.seed-nodes += "akka.tcp://$clusterName@$dlClusterSeedNode"""")
-            }
-
-          HuffConfig(clusterName, clusterPort, isSeed, seedNodeStrings, httpAddr, httpPort)
+        case (clusterName, clusterPort, clusterAddress, httpAddr, httpPort) ⇒ 
+          HuffConfig(clusterName, clusterPort, clusterAddress, httpAddr, httpPort)
       }
 
 } 

@@ -51,10 +51,8 @@ services:
       - CONSUL_HOST=consul1
       - DL_CLUSTER_name=huffcluster
       - DL_CLUSTER_ADDRESS=huff-cluster-demo1
-      - IS_SEED=yes
       - DL_HTTP_ADDRESS=huff-cluster-demo1
       - DL_HTTP_PORT=8080
-      - DL_CLUSTER_SEED_NODE=""
       - DL_CLUSTER_PORT=2551
 
   huff-cluster-demo2:
@@ -70,10 +68,8 @@ services:
       - CONSUL_HOST=consul1
       - DL_CLUSTER_name=huffcluster
       - DL_CLUSTER_ADDRESS=huff-cluster-demo2
-      - IS_SEED=yes
       - DL_HTTP_ADDRESS=huff-cluster-demo2
       - DL_HTTP_PORT=8080
-      - DL_CLUSTER_SEED_NODE=""
       - DL_CLUSTER_PORT=2551
 
   huff-cluster-demo3:
@@ -88,9 +84,7 @@ services:
       - CONSUL_HOST=consul1
       - DL_CLUSTER_name=huffcluster
       - DL_CLUSTER_ADDRESS=huff-cluster-demo3
-      - IS_SEED=yes
       - DL_HTTP_ADDRESS=huff-cluster-demo3
       - DL_HTTP_PORT=8080
-      - DL_CLUSTER_SEED_NODE=""
       - DL_CLUSTER_PORT=2551
 

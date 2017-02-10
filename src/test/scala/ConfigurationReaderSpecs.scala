@@ -50,18 +50,17 @@ object Config extends Properties("ConfigurationProperties") {
 
   property("parsing system-env variables w.r.t HuffConfig") = 
     forAll {
-      (clName: String, clPort: Int, isSeed: Boolean, seedNode:String, httpAddr:String, httpPort:Int) ⇒ 
+      (clName: String, clPort: Int, clAddress: String, httpAddr:String, httpPort:Int) ⇒ 
         val map = Map(
           "DL_CLUSTER_NAME"      -> clName,
           "DL_CLUSTER_PORT"      -> clPort.toString,
-          "IS_SEED"              -> isSeed.toString,
-          "DL_CLUSTER_SEED_NODE" -> seedNode,
+          "DL_CLUSTER_ADDRESS"   -> clAddress,
           "DL_HTTP_ADDRESS"      -> httpAddr,
           "DL_HTTP_PORT"         -> httpPort.toString
           )
         val c = deeplabs.config.Config(map)
           deeplabs.config.Validator.getHuffConfig(c) match {
-            case Valid(deeplabs.config.HuffConfig(_,_,_,_,_,_)) ⇒ true
+            case Valid(deeplabs.config.HuffConfig(_,_,_,_,_)) ⇒ true
             case _ ⇒ false
           }
     }
