@@ -48,7 +48,7 @@ val AkkaHttpDeps = Seq(
 // Cats , Circe and Eff library dependencies
 val catsVersion = "0.9.0"
 val effVersion  = "2.2.0"
-val circeVersion = "0.6.1"
+val circeVersion = "0.7.0"
 
 // to write types like Reader[String, ?]
 addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3")
