@@ -122,6 +122,6 @@ This deployment scenario is suitable when you have a machine with a fairly large
 of compute power, ram and hard drives. Using the `docker-compose` approach, you can run `Huff`
 using docker _locally_ (IP assignment is done by `docker`). In this scenario, you will be launching 
 3 `consul.io` agents and 3 `Huff` nodes in clustered mode. Once its up, you can see the status of the cluster
-locally on your browser by pointing to `http://localhost:8501` like !(https://cloud.githubusercontent.com/assets/447680/22868175/e7de2f26-f1cd-11e6-8a05-eb860538fdcf.png)
+locally on your browser by pointing to `http://localhost:8501` like ![Status](https://cloud.githubusercontent.com/assets/447680/22868175/e7de2f26-f1cd-11e6-8a05-eb860538fdcf.png)
 
 
