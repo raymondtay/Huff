@@ -8,6 +8,9 @@ Huff is a peer-to-peer clustering solution that provides the following functiona
 
 # Updates
 
+- 10 Feb 2017
+  - Environment variables `IS_SEED` and `DL_CLUSTER_SEED_NODE` removed from `Huff`
+  - Monitoring service captures the state when the clustered service is partitioned
 - 4  Feb 2017
  - Service discovery [consul.io](http://consul.io) is added to `Huff` in cluster mode. 
  - `Huff` can now run via `docker-compose` which starts up 3 `consul.io` agents in server mode; together with 3 `Huff` agents as a `akka-cluster`.
@@ -26,11 +29,9 @@ either locally or distributed across nodes:
 
 - `DL_CLUSTER_NAME`      # a name for the cluster  e.g. huffcluster
 - `DL_CLUSTER_ADDRESS`   # valid hostname or ipv4/v6 e.g. `localhost`, `0.0.0.0`
-- `DL_CLUSTER_SEED_NODE` # Must be pointing to a valid url of the cluster e.g. `localhost:2551`, `0.0.0.0:2551` 
 - `DL_CLUSTER_PORT`      # Port number of cluster is listening e.g `2551` (this needs to be `distinct` if cluster nodes are run locally i.e. w/o `docker`)
 - `DL_HTTP_ADDRESS`      # valid hostname or ipv4/v6 e.g. `localhost`, `0.0.0.0`
 - `DL_HTTP_PORT`         # Port number of http servie e.g. `8080`
-- `IS_SEED`              # when `true`,`yes` or `1` then we will launch this as a seed-node otherwise its converse means not a seed-node
 - `JMX_REMOTE_PORT`
 - `JMX_REMOTE_SSL`
 - `JMX_REMOTE_AUTHENTICATE`
@@ -115,5 +116,12 @@ one another.
 Now, you need to re-run the `Http Test` again to make sure you can see the message `System-node OK`
 being printed.
 
+## Running in _psuedo_-production environment
+
+This deployment scenario is suitable when you have a machine with a fairly large capacity in terms
+of compute power, ram and hard drives. Using the `docker-compose` approach, you can run `Huff`
+using docker _locally_ (IP assignment is done by `docker`). In this scenario, you will be launching 
+3 `consul.io` agents and 3 `Huff` nodes in clustered mode. Once its up, you can see the status of the cluster
+locally on your browser by pointing to `http://localhost:8501` like ![ec2_cluster_status.png](/images/ec2_cluster.status.png)
 
 
