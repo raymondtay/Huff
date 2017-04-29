@@ -1,0 +1,68 @@
+{
+  "service": {
+    "name": "huff-rest-service",
+    "tags": ["http-cluster"],
+    "address": "127.0.0.1",
+    "port": 2551,
+    "enableTagOverride": false,
+    "checks": [
+      {
+        "id": "akka-cluster-port-1",
+        "name": "TCP on port 2551",
+        "tcp": "0.0.0.0:2551",
+        "interval": "10s",
+        "timeout": "1s"
+      },
+      {
+        "id": "http-status-1",
+        "name": "HTTP API on port 8080",
+        "http": "http://localhost:8080/status",
+        "interval": "10s",
+        "timeout": "1s"
+      }]
+  },
+  "service": {
+    "name": "huff-rest-service",
+    "tags": ["http-cluster"],
+    "address": "127.0.0.1",
+    "port": 2552,
+    "enableTagOverride": false,
+    "checks": [
+      {
+        "id": "akka-cluster-port-2",
+        "name": "TCP on port 2552",
+        "tcp": "0.0.0.0:2552",
+        "interval": "10s",
+        "timeout": "1s"
+      },
+      {
+        "id": "http-status-2",
+        "name": "HTTP API on port 8081",
+        "http": "http://localhost:8081/status",
+        "interval": "10s",
+        "timeout": "1s"
+      }]
+  },
+  "service": {
+    "name": "huff-rest-service",
+    "tags": ["http-cluster"],
+    "address": "127.0.0.1",
+    "port": 2553,
+    "enableTagOverride": false,
+    "checks": [
+      {
+        "id": "akka-cluster-port-3",
+        "name": "TCP on port 2553",
+        "tcp": "0.0.0.0:2553",
+        "interval": "10s",
+        "timeout": "1s"
+      },
+      {
+        "id": "http-status-3",
+        "name": "HTTP API on port 8082",
+        "http": "http://localhost:8082/status",
+        "interval": "10s",
+        "timeout": "1s"
+      }]
+  }
+}
