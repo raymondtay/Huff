@@ -64,6 +64,9 @@ object Huff extends App {
     implicit val actorMaterializer = ActorMaterializer()
     actorSystem.actorOf(Props(classOf[HuffListener], config), name = "HuffListener")
 
+    // start a chat
+    actorSystem.actorOf(Props[chat.RandomUser], s"raymond-${actorSystem##}")
+
     for {
       heartBeat <- getHuffHeartbeatConfig(Config(ScalaCfg.heartBeatCfg(config)))
     } {
