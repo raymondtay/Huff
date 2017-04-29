@@ -99,7 +99,7 @@ doctestMarkdownEnabled  := true
 // [info] The new value will be used by *:libraryDependencies, compile:compile::scalacOptions
 // [info] Reapplying settings...
 // [info] Set current project to Huff (in build file:/Users/tayboonl/Huff/)
-coverageEnabled := true
+coverageEnabled := false
 coverageExcludedPackages := "deeplabs\\.http\\.RestServer;deeplabs\\.cluster\\.Huff.*"
 
 // Scalaconfig library
