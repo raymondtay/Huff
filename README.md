@@ -9,7 +9,7 @@ Huff is a peer-to-peer clustering solution that provides the following functiona
 # Updates
 
 - 10 Feb 2017
-  - Environment variables `IS_SEED` and `DL_CLUSTER_SEED_NODE` removed from `Huff`
+  - Environment variables `IS_SEED` and `HUFF_CLUSTER_SEED_NODE` removed from `Huff`
   - Monitoring service captures the state when the clustered service is partitioned
 - 4  Feb 2017
  - Service discovery [consul.io](http://consul.io) is added to `Huff` in cluster mode. 
@@ -27,11 +27,11 @@ Huff is a peer-to-peer clustering solution that provides the following functiona
 The following variables affect how the cluster is to be run 
 either locally or distributed across nodes:
 
-- `DL_CLUSTER_NAME`      # a name for the cluster  e.g. huffcluster
-- `DL_CLUSTER_ADDRESS`   # valid hostname or ipv4/v6 e.g. `localhost`, `0.0.0.0`
-- `DL_CLUSTER_PORT`      # Port number of cluster is listening e.g `2551` (this needs to be `distinct` if cluster nodes are run locally i.e. w/o `docker`)
-- `DL_HTTP_ADDRESS`      # valid hostname or ipv4/v6 e.g. `localhost`, `0.0.0.0`
-- `DL_HTTP_PORT`         # Port number of http servie e.g. `8080`
+- `HUFF_CLUSTER_NAME`      # a name for the cluster  e.g. huffcluster
+- `HUFF_CLUSTER_ADDRESS`   # valid hostname or ipv4/v6 e.g. `localhost`, `0.0.0.0`
+- `HUFF_CLUSTER_PORT`      # Port number of cluster is listening e.g `2551` (this needs to be `distinct` if cluster nodes are run locally i.e. w/o `docker`)
+- `HUFF_HTTP_ADDRESS`      # valid hostname or ipv4/v6 e.g. `localhost`, `0.0.0.0`
+- `HUFF_HTTP_PORT`         # Port number of http servie e.g. `8080`
 - `JMX_REMOTE_PORT`
 - `JMX_REMOTE_SSL`
 - `JMX_REMOTE_AUTHENTICATE`
@@ -49,22 +49,22 @@ To run a 2-node cluster node on your local machine, you need to perform the foll
 - Open 2 terminals and navigate to the code base
 - In 1st terminal, do the following:
  
-    > export DL_HTTP_ADDRESS=localhost
+    > export HUFF_HTTP_ADDRESS=localhost
     
-    > export DL_HTTP_PORT=8080
+    > export HUFF_HTTP_PORT=8080
     
     > codebase_dir #> sbt run
 
 - In 2nd terminal, as we cannot launch another process to bind to the same ports, so we have
   to make sure they run on different ports. E.g.
   
-    >  export DL_CLUSTER_ADDRESS=localhost
+    >  export HUFF_CLUSTER_ADDRESS=localhost
     
-    >  export DL_CLUSTER_PORT=2552
+    >  export HUFF_CLUSTER_PORT=2552
     
-    >  export DL_HTTP_ADDRESS=localhost
+    >  export HUFF_HTTP_ADDRESS=localhost
     
-    >  export DL_HTTP_PORT=8081
+    >  export HUFF_HTTP_PORT=8081
     
     >  codebase_dir #> sbt -DJMX_REMOTE_PORT=9999 run
 

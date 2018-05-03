@@ -1,4 +1,4 @@
-package deeplabs.config
+package huff.config
 
 // 
 // Code here is mostly for reading values 
@@ -154,11 +154,11 @@ object Validator {
 
   def getHuffConfig(config: Config) : ValidatedNel[ConfigError, HuffConfig] = 
     Apply[ValidatedNel[ConfigError, ?]].map5(
-      config.parse[String] ("DL_CLUSTER_NAME").toValidatedNel,
-      config.parse[Int]    ("DL_CLUSTER_PORT").toValidatedNel,
-      config.parse[String] ("DL_CLUSTER_ADDRESS").toValidatedNel,
-      config.parse[String] ("DL_HTTP_ADDRESS").toValidatedNel,
-      config.parse[Int]    ("DL_HTTP_PORT").toValidatedNel) {
+      config.parse[String] ("HUFF_CLUSTER_NAME").toValidatedNel,
+      config.parse[Int]    ("HUFF_CLUSTER_PORT").toValidatedNel,
+      config.parse[String] ("HUFF_CLUSTER_ADDRESS").toValidatedNel,
+      config.parse[String] ("HUFF_HTTP_ADDRESS").toValidatedNel,
+      config.parse[Int]    ("HUFF_HTTP_PORT").toValidatedNel) {
         case (clusterName, clusterPort, clusterAddress, httpAddr, httpPort) ⇒ 
           HuffConfig(clusterName, clusterPort, clusterAddress, httpAddr, httpPort)
       }

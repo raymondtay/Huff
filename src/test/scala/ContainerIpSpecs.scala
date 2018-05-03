@@ -1,7 +1,7 @@
-package deeplabs.cluster
+package huff.cluster
 
 // Code here is to run tests all found in the following packages:
-// - deeplabs.cluster
+// - huff.cluster
 // 
 
 import org.scalacheck.{Arbitrary, Gen, Properties,Prop}
@@ -9,7 +9,7 @@ import Arbitrary.arbitrary
 import Gen.{containerOfN, choose, pick, mapOf, listOf, oneOf}
 import Prop.{forAll, throws, AnyOperators}
 import cats.data.Validated.{Invalid, Valid}
-import deeplabs.config.{ConfigError, ParseError, MissingConfig}
+import huff.config.{ConfigError, ParseError, MissingConfig}
 
 object ContainerHostIpSpecs extends Properties("ContainerHostIpProperties") {
   // This test is valid for Mac OS X and Linux since the interface

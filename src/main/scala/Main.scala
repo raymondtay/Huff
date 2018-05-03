@@ -1,4 +1,4 @@
-package deeplabs.cluster
+package huff.cluster
 
 /** 
  Huff -
@@ -28,9 +28,9 @@ import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
 import scala.language.postfixOps
 
 object Huff extends App {
-  import deeplabs.http._
-  import deeplabs.http.json._
-  import deeplabs.config._
+  import huff.http._
+  import huff.http.json._
+  import huff.config._
 
   // Get the default logger
   val logger = Logger(Huff.getClass)
@@ -46,7 +46,7 @@ object Huff extends App {
   for {
     c <- getHuffConfig(systemEnvConfig)
   } {
-    val data = DLLog(
+    val data = HuffLog(
       service_name = "Huff Cluster",
       category     = "application",
       event_type   = "operation",
@@ -63,9 +63,6 @@ object Huff extends App {
 
     implicit val actorMaterializer = ActorMaterializer()
     actorSystem.actorOf(Props(classOf[HuffListener], config), name = "HuffListener")
-
-    // start a chat
-    actorSystem.actorOf(Props[chat.RandomUser], s"raymond-${actorSystem##}")
 
     for {
       heartBeat <- getHuffHeartbeatConfig(Config(ScalaCfg.heartBeatCfg(config)))
@@ -88,11 +85,11 @@ class Heartbeat(
   val interval     : scala.concurrent.duration.FiniteDuration, 
   val heartBeatMsg : String) extends Actor with ActorLogging {
 
-  import deeplabs.http.json.DLLog
+  import huff.http.json.HuffLog
   import scala.concurrent.duration._
   import context.dispatcher
   context.system.scheduler.schedule(initialDelay, interval, self, "Tick")
-  val data = DLLog(
+  val data = HuffLog(
       service_name = "Huff Cluster",
       category     = "application",
       event_type   = "heartbeat",

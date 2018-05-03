@@ -1,8 +1,8 @@
-package deeplabs.config.test
+package huff.config.test
 
 
 // Code here is to run tests all found in the following packages:
-// - deeplabs.config
+// - huff.config
 // 
 
 import org.scalacheck.{Arbitrary, Gen, Properties,Prop}
@@ -11,7 +11,7 @@ import Gen.{containerOfN, choose, pick, posNum, negNum, mapOf, listOf, oneOf}
 import Prop.{forAll, throws, AnyOperators}
 import cats.data.NonEmptyList
 import cats.data.Validated.{Invalid, Valid}
-import deeplabs.config.{ConfigError, ParseError, MissingConfig}
+import huff.config.{ConfigError, ParseError, MissingConfig}
 import scala.concurrent.duration.{Duration,FiniteDuration}
 
 object Config extends Properties("ConfigurationProperties") {
@@ -52,15 +52,15 @@ object Config extends Properties("ConfigurationProperties") {
     forAll {
       (clName: String, clPort: Int, clAddress: String, httpAddr:String, httpPort:Int) ⇒ 
         val map = Map(
-          "DL_CLUSTER_NAME"      -> clName,
-          "DL_CLUSTER_PORT"      -> clPort.toString,
-          "DL_CLUSTER_ADDRESS"   -> clAddress,
-          "DL_HTTP_ADDRESS"      -> httpAddr,
-          "DL_HTTP_PORT"         -> httpPort.toString
+          "HUFF_CLUSTER_NAME"      -> clName,
+          "HUFF_CLUSTER_PORT"      -> clPort.toString,
+          "HUFF_CLUSTER_ADDRESS"   -> clAddress,
+          "HUFF_HTTP_ADDRESS"      -> httpAddr,
+          "HUFF_HTTP_PORT"         -> httpPort.toString
           )
-        val c = deeplabs.config.Config(map)
-          deeplabs.config.Validator.getHuffConfig(c) match {
-            case Valid(deeplabs.config.HuffConfig(_,_,_,_,_)) ⇒ true
+        val c = huff.config.Config(map)
+          huff.config.Validator.getHuffConfig(c) match {
+            case Valid(huff.config.HuffConfig(_,_,_,_,_)) ⇒ true
             case _ ⇒ false
           }
     }
@@ -70,7 +70,7 @@ object Config extends Properties("ConfigurationProperties") {
         if (map.isEmpty) {
           true 
         } else {
-          val c = deeplabs.config.Config(map)
+          val c = huff.config.Config(map)
           val (key, _) = map.head
           c.parse[String](key).isValid match {
 	    case true ⇒ true
@@ -84,7 +84,7 @@ object Config extends Properties("ConfigurationProperties") {
   property("parsing map of K:Int keys, V:{non-Int,Int} values") = 
     forAll(someIntNsomeNonIntStrings) {
       s:String ⇒ 
-        val c = deeplabs.config.Config(Map(1.toString -> s))
+        val c = huff.config.Config(Map(1.toString -> s))
         c.parse[Int](1.toString) match {
           case Valid(v) ⇒ true // expecting this to be true
           case Invalid(ParseError(_)) ⇒ true // expecting this to be true
@@ -98,7 +98,7 @@ object Config extends Properties("ConfigurationProperties") {
         if (map.isEmpty) {
           true 
         } else {
-          val c = deeplabs.config.Config(map)
+          val c = huff.config.Config(map)
           val (key, _) = map.head
           c.parse[Int](key).isValid match {
 	    case true ⇒ true
@@ -114,7 +114,7 @@ object Config extends Properties("ConfigurationProperties") {
           true 
         } else {
           val invalidKey = 42.toString // this is an invalid key for our map
-          val c = deeplabs.config.Config(map)
+          val c = huff.config.Config(map)
           c.parse[String](invalidKey).isInvalid match {
             case true ⇒ true
             case false ⇒ false
@@ -137,7 +137,7 @@ object Config extends Properties("ConfigurationProperties") {
   property("parsing errors in allowed values ∈ configuration should be detected") =
     forAll(allowedValuesGen) {
       s:String ⇒ 
-        val c = deeplabs.config.Config(Map(1.toString -> s))
+        val c = huff.config.Config(Map(1.toString -> s))
         c.parse[Boolean](1.toString).isValid match {
           case true ⇒ true
           case false ⇒ false
@@ -150,7 +150,7 @@ object Config extends Properties("ConfigurationProperties") {
         if (map.isEmpty) {
           true 
         } else {
-          val c = deeplabs.config.Config(map)
+          val c = huff.config.Config(map)
           val (key, _) = map.head
           c.parse[Boolean](key).isInvalid match {
             case true ⇒ true
@@ -162,7 +162,7 @@ object Config extends Properties("ConfigurationProperties") {
   property("valid keys with parsing errors in non-Duration values ∈ configuration should be detected") =
     forAll(validtimeFormattedStrings) {
       s:String ⇒ 
-        val c = deeplabs.config.Config(Map(1.toString -> s))
+        val c = huff.config.Config(Map(1.toString -> s))
         c.parse[FiniteDuration](1.toString).isValid match {
           case true ⇒ true
           case false ⇒ false
@@ -172,7 +172,7 @@ object Config extends Properties("ConfigurationProperties") {
   property("valid keys with no parsing errors w.r.t Duration values ∈ configuration should be detected") =
     forAll(invalidtimeFormattedStrings) {
       s:String ⇒ 
-        val c = deeplabs.config.Config(Map(1.toString -> s))
+        val c = huff.config.Config(Map(1.toString -> s))
         c.parse[FiniteDuration](1.toString).isInvalid match {
           case true ⇒ true
           case false ⇒ false
@@ -183,7 +183,7 @@ object Config extends Properties("ConfigurationProperties") {
     forAll {
       (x: String, y:String) ⇒ 
         implicit val nelSemigroup: cats.Semigroup[NonEmptyList[String]] = cats.SemigroupK[NonEmptyList].algebra[String]
-        deeplabs.config.Validator.validate(Valid(x), Valid(y))((_:String) ++ (_:String)) == Valid(x++y)
+        huff.config.Validator.validate(Valid(x), Valid(y))((_:String) ++ (_:String)) == Valid(x++y)
     }
   }
 
@@ -192,7 +192,7 @@ object Config extends Properties("ConfigurationProperties") {
       (x: Int, y:Int) ⇒ 
         import cats.implicits._
         implicitly[cats.Semigroup[Int]]
-        deeplabs.config.Validator.validate(Invalid(x), Invalid(y))((_:Int) + (_:Int)) == Invalid(x+y)
+        huff.config.Validator.validate(Invalid(x), Invalid(y))((_:Int) + (_:Int)) == Invalid(x+y)
     }
   }
 

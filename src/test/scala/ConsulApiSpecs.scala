@@ -1,10 +1,10 @@
-package deeplabs.cluster
+package huff.cluster
 
 import org.scalacheck.{Arbitrary, Gen, Properties,Prop}
 import Arbitrary.arbitrary
 import Gen.{containerOfN, choose, pick, mapOf, listOf, oneOf}
 import Prop.{forAll, throws, AnyOperators}
-import deeplabs.config.{ConfigError, ParseError, MissingConfig}
+import huff.config.{ConfigError, ParseError, MissingConfig}
 import com.typesafe.config.{Config, ConfigFactory}
 import org.specs2.specification._
 import org.specs2._

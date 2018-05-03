@@ -1,4 +1,4 @@
-package deeplabs.http
+package huff.http
 
 import java.io.File
 
@@ -9,7 +9,7 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
-import deeplabs.http.json.DLLog
+import huff.http.json.HuffLog
 import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
 import com.typesafe.scalalogging.Logger
 
@@ -38,7 +38,7 @@ trait RestService {
  
   val logger = Logger("RestService")
 
-  val data = DLLog(
+  val data = HuffLog(
       service_name = "Huff Cluster",
       category     = "application",
       event_type   = "operation",

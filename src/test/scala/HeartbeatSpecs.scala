@@ -1,4 +1,4 @@
-package deeplabs.cluster
+package huff.cluster
 
 import scala.concurrent.duration._
 
@@ -8,7 +8,7 @@ import akka.testkit._
 import com.typesafe.config._
 
 class HeartbeatSpecs extends WordSpec with BeforeAndAfterAll { 
-  import deeplabs.config._
+  import huff.config._
   import Validator._
 
   val testConf: com.typesafe.config.Config =

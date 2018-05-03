@@ -1,4 +1,4 @@
-package deeplabs.cluster
+package huff.cluster
 
 import scala.language.postfixOps
 import scala.collection.JavaConversions._

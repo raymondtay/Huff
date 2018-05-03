@@ -1,4 +1,4 @@
-package deeplabs.http
+package huff.http
 
 
 import akka.http.scaladsl.testkit._

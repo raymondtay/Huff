@@ -1,7 +1,7 @@
-package deeplabs.cluster
+package huff.cluster
 
 import akka.actor.{ActorSystem, Address}
-import deeplabs.config.{Config, ScalaCfg, Validator}
+import huff.config.{Config, ScalaCfg, Validator}
 import com.orbitz.consul.model.health.ServiceHealth
 
 //

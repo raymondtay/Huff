@@ -40,11 +40,11 @@ RUN \
 # Getting the Cluster environment ready.
 # Running the process as a foreground
 WORKDIR /root/huff-0.9
-ENV DL_CLUSTER_NAME huffcluster
-ENV DL_CLUSTER_ADDRESS 0.0.0.0
-ENV DL_CLUSTER_PORT 2551
-ENV DL_HTTP_ADDRESS 0.0.0.0
-ENV DL_HTTP_PORT    8080
+ENV HUFF_CLUSTER_NAME huffcluster
+ENV HUFF_CLUSTER_ADDRESS 0.0.0.0
+ENV HUFF_CLUSTER_PORT 2551
+ENV HUFF_HTTP_ADDRESS 0.0.0.0
+ENV HUFF_HTTP_PORT    8080
 # Commented out the entry point
 ENTRYPOINT ["./bin/huff"]
 
